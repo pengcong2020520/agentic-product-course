@@ -11,7 +11,9 @@
 import argparse
 import json
 import os
+import threading
 import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from openai import OpenAI
@@ -62,6 +64,7 @@ def main():
     ap.add_argument("--base-url", default=os.environ.get("PRELABEL_BASE_URL", "https://api.moonshot.cn/v1"))
     ap.add_argument("--batch", type=int, default=10)
     ap.add_argument("--limit", type=int, default=0, help="只标前 N 条（试跑用）")
+    ap.add_argument("--workers", type=int, default=4, help="并发请求数")
     args = ap.parse_args()
 
     client = OpenAI(api_key=os.environ["KIMI_API_KEY"], base_url=args.base_url)
@@ -76,26 +79,28 @@ def main():
     usage = {"prompt": 0, "completion": 0, "cached": 0}
     print(f"待标 {len(todo)} 条（已完成 {len(done)}），模型 {args.model}")
 
-    with out.open("a", encoding="utf-8") as f:
-        for i in range(0, len(todo), args.batch):
-            batch = todo[i: i + args.batch]
-            user = json.dumps([{"id": r["id"], "app": r["app"], "rating": r["rating"], "text": r["text"]}
-                               for r in batch], ensure_ascii=False)
-            for attempt in range(3):
-                try:
-                    resp = client.chat.completions.create(
-                        model=args.model,
-                        messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-                        response_format={"type": "json_object"},
-                    )
-                    items = {x.get("id"): x for x in json.loads(resp.choices[0].message.content)["items"]}
-                    break
-                except Exception as exc:  # 网络、限流、格式错误都重试；三次失败则整批记为没能判定
-                    print(f"  第 {i} 批第 {attempt + 1} 次失败：{exc}")
-                    items = {}
-                    time.sleep(5 * (attempt + 1))
-            else:
+    lock = threading.Lock()
+    batches = [todo[i: i + args.batch] for i in range(0, len(todo), args.batch)]
+    finished = [0]
+
+    def run(batch):
+        user = json.dumps([{"id": r["id"], "app": r["app"], "rating": r["rating"], "text": r["text"]}
+                           for r in batch], ensure_ascii=False)
+        items, resp = {}, None
+        for attempt in range(3):
+            try:
+                resp = client.chat.completions.create(
+                    model=args.model,
+                    messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
+                    response_format={"type": "json_object"},
+                )
+                items = {x.get("id"): x for x in json.loads(resp.choices[0].message.content)["items"]}
+                break
+            except Exception as exc:  # 网络、限流、格式错误都重试；三次失败则整批记为没能判定
+                print(f"  批次 {batch[0]['id']} 第 {attempt + 1} 次失败：{exc}")
                 resp = None
+                time.sleep(5 * (attempt + 1))
+        with lock:
             if resp is not None and resp.usage:
                 usage["prompt"] += resp.usage.prompt_tokens
                 usage["completion"] += resp.usage.completion_tokens
@@ -106,7 +111,11 @@ def main():
                 f.write(json.dumps({"id": r["id"], "labels": labels, "undetermined": invalid,
                                     "model": args.model, "genome": GENOME["version"]}, ensure_ascii=False) + "\n")
             f.flush()
-            print(f"  {min(i + args.batch, len(todo))}/{len(todo)}  tokens={usage}")
+            finished[0] += len(batch)
+            print(f"  {finished[0]}/{len(todo)}  tokens={usage}", flush=True)
+
+    with out.open("a", encoding="utf-8") as f, ThreadPoolExecutor(max_workers=args.workers) as pool:
+        list(pool.map(run, batches))
     print("用量：", usage)
 
 

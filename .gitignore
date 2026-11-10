@@ -8,3 +8,5 @@ briefs/
 data/
 .venv/
 pipeline/label/.env
+__pycache__/
+*.pyc

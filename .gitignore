@@ -4,3 +4,4 @@ node_modules/
 .runs/
 .DS_Store
 briefs/
+.private/

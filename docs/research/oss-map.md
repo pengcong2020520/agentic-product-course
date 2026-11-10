@@ -9,7 +9,7 @@
 | Agent harness | [openai/openai-agents-python](https://github.com/openai/openai-agents-python) | 30.6k / 2026-11 / MIT | Agent、Runner、Session、Guardrail、Handoff、Tracing、Voice；2026-04 起内置 Codex 式 harness 与沙箱（`agents.sandbox`） |
 | 模型接入 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 63.0k / 2026-11 / 混合 | Agents SDK 通过 LiteLLM 接国内模型（需核实目标模型的工具调用兼容性） |
 | Web 服务 | [fastapi/fastapi](https://github.com/fastapi/fastapi) | 104.6k / 2026-11 / MIT | API 与流式输出 |
-| 飞书 | [larksuite/oapi-sdk-python](https://github.com/larksuite/oapi-sdk-python) | 568 / 2026-10 / MIT | 官方 SDK：机器人事件、长连接、消息卡片 |
+| 飞书 | [larksuite/oapi-sdk-python](https://github.com/larksuite/oapi-sdk-python) | 568 / 2026-10 / MIT | 官方 SDK：`lark.ws.Client` 长连接收事件（无需公网回调，Mac 本机即可调试）、回复消息、消息卡片 |
 | 飞书参考 | [ConnectAI-E/feishu-openai](https://github.com/ConnectAI-E/feishu-openai) | 5.6k / 2025-07 / GPL-3.0 | 只作参考（GPL，不复制代码）：语音、角色扮演的交互设计 |
 
 ## 评测体系
@@ -38,9 +38,13 @@
 
 | 项目 | ★ / 更新 / 许可 | 说明 |
 |---|---|---|
-| Agents SDK `VoicePipeline` | — | STT → Agent → TTS；可换成自定义 STT/TTS。Realtime API 在国内不可用，主线走流水线 |
-| [modelscope/FunASR](https://github.com/modelscope/FunASR) | 21.0k / 2026-11 / MIT | 中文语音识别 |
-| [QwenAudio/CosyVoice](https://github.com/QwenAudio/CosyVoice) | 24.4k / 2026-05 / Apache-2.0 | 中文语音合成，情感与音色 |
+| [k2-fsa/sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx) | 15.9k / 2026-11 / Apache-2.0 | **首选**：只依赖 onnxruntime，Mac arm64 与 Linux 服务器 CPU 同一套；识别（SenseVoice、Paraformer 流式）与中文 TTS（MeloTTS、Kokoro、VITS） |
+| [QwenAudio/SenseVoice](https://github.com/QwenAudio/SenseVoice) | 9.7k / 2026-09 / MIT | 中文识别模型，经 sherpa-onnx 运行 |
+| [ruzhila/voiceapi](https://github.com/ruzhila/voiceapi) | 229 / 2025-11 / 未声明 | FastAPI + sherpa-onnx 的流式识别与合成参考（无许可证，只作参考） |
+| [Neywa-Labs/mlx-audio](https://github.com/Neywa-Labs/mlx-audio) | 8.2k / 2026-11 / MIT | Mac 专用（MLX），服务器不能跑，不作主线 |
+| Agents SDK `VoicePipeline` | — | STT → Agent → TTS 流水线，可接自定义 STT/TTS；Realtime API 在国内不可用 |
+| [modelscope/FunASR](https://github.com/modelscope/FunASR) | 21.0k / 2026-11 / MIT | 中文识别全家桶（备选） |
+| [QwenAudio/CosyVoice](https://github.com/QwenAudio/CosyVoice) | 24.4k / 2026-05 / Apache-2.0 | 情感合成效果好，但 CPU 推理慢，备选 |
 | [pipecat-ai/pipecat](https://github.com/pipecat-ai/pipecat)、[livekit/agents](https://github.com/livekit/agents) | 17.2k / 15.2k | 实时语音备选（打断、VAD） |
 
 ## 安全、隐私与数据
@@ -68,4 +72,5 @@
 
 - 国内模型（如 DeepSeek、Kimi、Qwen、GLM）经 LiteLLM 接 Agents SDK 时的工具调用、流式与 guardrail 兼容性；
 - Agents SDK 默认把 tracing 上报到 OpenAI，国内需关闭并改接 Langfuse；
-- 飞书机器人能否收发语音消息、消息格式与时长限制。
+- 飞书语音消息的音频格式（opus）与下载接口、回复语音的上传方式；
+- Kimi 当前模型名（如 `kimi-k2.6`）与 LiteLLM `moonshot/` 前缀在 Agents SDK 下的工具调用。

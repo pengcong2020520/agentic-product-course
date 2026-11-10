@@ -6,8 +6,9 @@
 
 | 用途 | 项目 | ★ / 最近更新 / 许可 | 说明 |
 |---|---|---|---|
-| Agent harness | [openai/openai-agents-python](https://github.com/openai/openai-agents-python) | 30.6k / 2026-11 / MIT | Agent、Runner、Session、Guardrail、Handoff、Tracing、Voice；2026-04 起内置 Codex 式 harness 与沙箱（`agents.sandbox`） |
-| 模型接入 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 63.0k / 2026-11 / 混合 | Agents SDK 通过 LiteLLM 接国内模型（需核实目标模型的工具调用兼容性） |
+| Agent harness | [openai/codex](https://github.com/openai/codex) | 134.6k / 2026-11 / Apache-2.0 | **已选**：App Server 接入；AGENTS.md、Skills、Subagents、MCP 原生支持；Kimi 原生支持其 Responses 接口 |
+| 备选 harness | [openai/openai-agents-python](https://github.com/openai/openai-agents-python) | 30.6k / 2026-11 / MIT | 未采用，作对照 |
+| 模型网关 | [BerriAI/litellm](https://github.com/BerriAI/litellm) | 63.0k / 2026-11 / 混合 | 模型服务一章的候选（统一接口、路由、配额、成本）；Codex 直连 Kimi 不需要它 |
 | Web 服务 | [fastapi/fastapi](https://github.com/fastapi/fastapi) | 104.6k / 2026-11 / MIT | API 与流式输出 |
 | 飞书 | [larksuite/oapi-sdk-python](https://github.com/larksuite/oapi-sdk-python) | 568 / 2026-10 / MIT | 官方 SDK：`lark.ws.Client` 长连接收事件（无需公网回调，Mac 本机即可调试）、回复消息、消息卡片 |
 | 飞书参考 | [ConnectAI-E/feishu-openai](https://github.com/ConnectAI-E/feishu-openai) | 5.6k / 2025-07 / GPL-3.0 | 只作参考（GPL，不复制代码）：语音、角色扮演的交互设计 |
@@ -55,7 +56,7 @@
 | [protectai/llm-guard](https://github.com/protectai/llm-guard) | 3.2k / 2026-07 / MIT | 输入输出扫描 |
 | [data-privacy-stack/presidio](https://github.com/data-privacy-stack/presidio) | 11.8k / 2026-11 / MIT | PII 识别与脱敏（需补中文识别器：手机号、身份证） |
 | [thu-coai/ShieldLM](https://github.com/thu-coai/ShieldLM)、[thu-coai/SafetyBench](https://github.com/thu-coai/SafetyBench) | — | 中文安全检测与评测 |
-| [HumanSignal/label-studio](https://github.com/HumanSignal/label-studio)、[argilla-io/argilla](https://github.com/argilla-io/argilla) | 28.7k / 5.2k | 打标（先用 Langfuse 标注队列，不够再引入） |
+| [HumanSignal/label-studio](https://github.com/HumanSignal/label-studio)、[argilla-io/argilla](https://github.com/argilla-io/argilla) | 28.7k / 5.2k | 原始数据集打标（第一部分核心工具），以及评测人工审核 |
 
 ## 情感支持与危机相关数据（只用于评测，逐个核实许可）
 

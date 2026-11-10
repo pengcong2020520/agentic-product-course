@@ -7,6 +7,7 @@
 ## 当前文档
 
 - [调研：生产级 Agentic 产品的方法论与设计思路](docs/research/methodology.md)
+- [开源项目调研（按章节）](docs/research/oss-map.md)
 - [课程规划草案（待讨论）](docs/course-plan-draft.md)
 
 ## 结构

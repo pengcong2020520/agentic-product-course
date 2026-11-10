@@ -1,0 +1,16 @@
+{
+  "version": "0.1",
+  "genes": [
+    {"id": "relevant", "title": "是否与陪伴产品相关", "type": "single", "values": {"yes": "相关", "off_topic": "不相关（跳过其余基因）"}},
+    {"id": "g1_user", "title": "G1 用户画像", "type": "multi", "values": {"dream_partner": "梦女/乙女向", "creator": "角色创作者", "story_player": "剧情玩家", "confider": "倾诉者", "power_user": "进阶玩家", "tool_user": "工具型用户", "minor_hint": "疑似未成年", "unknown": "不明"}},
+    {"id": "g2_motive", "title": "G2 使用动机", "type": "multi", "values": {"companionship": "情感陪伴/精神寄托", "romance": "亲密关系想象", "roleplay": "剧情扮演", "pastime": "打发时间", "creation": "创作与分享", "utility": "实用问答", "unknown": "不明"}},
+    {"id": "g3_touchpoint", "title": "G3 体验触点（最多3个，按主次）", "type": "multi", "max": 3, "values": {"persona": "人设一致", "memory": "记忆与连续性", "dialogue": "对话质量", "agency": "主动与推进", "moderation": "内容审核", "voice": "语音", "creation_tool": "创作工具", "play_feature": "玩法功能", "monetization": "商业化", "reliability": "稳定与数据", "platform": "平台适配", "lifecycle": "功能下线/迁移"}},
+    {"id": "g4_emotion", "title": "G4 情绪", "type": "single", "values": {"delight": "喜爱", "satisfied": "满意", "neutral": "中性", "disappointed": "失望", "angry": "愤怒", "anxious": "害怕失去"}},
+    {"id": "g4_intensity", "title": "G4 情绪强度", "type": "rating", "values": [1, 2, 3]},
+    {"id": "g5_voice_type", "title": "G5 声音类型", "type": "single", "values": {"problem": "问题反馈", "request": "功能请求", "expectation": "对AI行为的期望", "praise": "价值肯定", "comparison": "竞品/旧版对比"}},
+    {"id": "g6_stage", "title": "G6 关系阶段", "type": "single", "values": {"first_try": "初次体验", "ongoing": "持续使用", "veteran": "老用户", "churning": "流失/准备离开", "unknown": "不明"}},
+    {"id": "g7_expected", "title": "G7 期望的 Agent 行为（Agent 应当……，可为空）", "type": "text"},
+    {"id": "g8_solvable", "title": "G8 Agent 可解性", "type": "single", "values": {"agent": "Agent 设计", "platform": "中台能力", "business": "商业与运营", "mixed": "多层共同"}},
+    {"id": "g9_risk", "title": "G9 风险信号（可为空）", "type": "multi", "optional": true, "values": {"minor": "未成年迹象", "dependency": "强情感依赖", "billing_dispute": "扣费争议", "data_loss": "数据丢失"}}
+  ]
+}

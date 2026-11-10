@@ -6,3 +6,5 @@ node_modules/
 briefs/
 .private/
 data/
+.venv/
+pipeline/label/.env

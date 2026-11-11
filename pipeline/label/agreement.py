@@ -1,10 +1,10 @@
-"""三方一致性与合并：主标注（Kimi）与两个独立复标（Codex、Grok）。
+"""多方一致性与合并：主标注（Codex）与独立复标（Grok），也支持三方。
 
 按 docs/genome/annotation-protocol.md 第 4、5 节计算：单选 Cohen's κ / Fleiss' κ，多选逐标签 κ 与 Jaccard，
 强度用加权 κ；某方缺失或不合法记为"没能判定"，单独计数。输出一致性报告和合并结果（含是否需人工裁决）。
 
-用法：python pipeline/label/agreement.py --kimi data/labeled/prelabels-v0.2.jsonl \
-        --other codex=data/double/codex --other grok=data/double/grok --out data/double/report
+用法：python pipeline/label/agreement.py --ann codex=data/double/codex --ann grok=data/double/grok \
+        --out data/double/report
 """
 import argparse
 import json
@@ -76,13 +76,12 @@ def r3(x):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--kimi", required=True)
-    ap.add_argument("--other", action="append", default=[], help="名字=路径")
+    ap.add_argument("--ann", action="append", required=True, help="名字=路径（文件或目录），第一个为主标注")
     ap.add_argument("--out", default="data/double/report")
     args = ap.parse_args()
 
-    ann = {"kimi": load(args.kimi)}
-    for spec in args.other:
+    ann = {}
+    for spec in args.ann:
         name, path = spec.split("=", 1)
         ann[name] = load(path)
     names = list(ann)

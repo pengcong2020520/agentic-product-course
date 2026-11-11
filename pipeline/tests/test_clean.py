@@ -19,7 +19,7 @@ class CleanTests(unittest.TestCase):
         # Synthetic pattern fixtures, not real contact or identity information.
         cases = {
             "[手机号]": "19900000000",
-            "[邮箱]": "fixture@example.invalid",
+            "[邮箱]": "fixture@example.com",
             "[链接]": "https://example.invalid/fixture",
             "[身份证]": "00000000000000000X",
             "[账号]": "微信号 abc12345",

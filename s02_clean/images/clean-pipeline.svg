@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 430" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#134e4a"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="430" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">清洗与去标识 — 每一步都能对上条数</text>
+
+  <rect x="40" y="96" width="200" height="76" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="140" y="126" fill="#134e4a" font-size="14" font-weight="700" text-anchor="middle">1 统一空白</text>
+  <text x="140" y="148" fill="#0f766e" font-size="12" text-anchor="middle">NFKC，空白收拢</text>
+
+  <line x1="240" y1="134" x2="278" y2="134" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="280" y="96" width="200" height="76" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="380" y="126" fill="#134e4a" font-size="14" font-weight="700" text-anchor="middle">2 去标识</text>
+  <text x="380" y="148" fill="#0f766e" font-size="12" text-anchor="middle">换成占位符</text>
+
+  <line x1="480" y1="134" x2="518" y2="134" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="520" y="96" width="200" height="76" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="620" y="126" fill="#134e4a" font-size="14" font-weight="700" text-anchor="middle">3 完全去重</text>
+  <text x="620" y="148" fill="#0f766e" font-size="12" text-anchor="middle">剩下 5,486</text>
+
+  <path d="M 620 172 L 620 220 L 140 220 L 140 266" fill="none" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="380" y="212" fill="#0f766e" font-size="11" text-anchor="middle">同一应用内再比一次</text>
+
+  <rect x="40" y="268" width="200" height="76" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="2"/>
+  <text x="140" y="298" fill="#92400e" font-size="14" font-weight="700" text-anchor="middle">4 近似去重</text>
+  <text x="140" y="320" fill="#b45309" font-size="12" text-anchor="middle">≥ 0.85，剩下 5,481</text>
+
+  <line x1="240" y1="306" x2="278" y2="306" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="280" y="268" width="200" height="76" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="298" fill="#92400e" font-size="14" font-weight="700" text-anchor="middle">5 标 low_info</text>
+  <text x="380" y="320" fill="#b45309" font-size="12" text-anchor="middle">924 条留下，不删</text>
+
+  <line x1="480" y1="306" x2="518" y2="306" stroke="#0f766e" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="520" y="268" width="200" height="76" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="620" y="298" fill="#166534" font-size="14" font-weight="700" text-anchor="middle">6 进入标注</text>
+  <text x="620" y="320" fill="#15803d" font-size="12" text-anchor="middle">4,557 条</text>
+
+  <rect x="40" y="364" width="680" height="48" rx="6" fill="#f0fdfa"/>
+  <text x="380" y="384" fill="#134e4a" font-size="12" text-anchor="middle">5,522 → 5,486 → 5,481。少于 10 个字只标记。</text>
+  <text x="380" y="402" fill="#0f766e" font-size="11" text-anchor="middle">每一步的数量写进 reviews.report.json。</text>
+</svg>

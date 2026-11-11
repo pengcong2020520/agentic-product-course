@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 440" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="s04b-header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <marker id="s04b-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+    <marker id="s04b-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+    <marker id="s04b-amber" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="440" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#s04b-header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#s04b-header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">一块怎样才算完成</text>
+
+  <rect x="280" y="68" width="200" height="52" rx="8" fill="#f0f4ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="380" y="90" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">这块的输出文件</text>
+  <text x="380" y="108" fill="#64748b" font-size="11" text-anchor="middle">JSONL</text>
+  <line x1="380" y1="120" x2="380" y2="148" stroke="#555" stroke-width="1.5" marker-end="url(#s04b-arrow)"/>
+
+  <polygon points="380,152 500,206 380,260 260,206" fill="#fff8f0" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="202" fill="#92400e" font-size="12" font-weight="600" text-anchor="middle">非空且校验通过？</text>
+
+  <line x1="500" y1="206" x2="548" y2="206" stroke="#16a34a" stroke-width="2" marker-end="url(#s04b-green)"/>
+  <text x="524" y="198" fill="#16a34a" font-size="11" font-weight="600" text-anchor="middle">是</text>
+  <rect x="552" y="180" width="184" height="52" rx="22" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="644" y="202" fill="#166534" font-size="13" font-weight="600" text-anchor="middle">跳过</text>
+  <text x="644" y="220" fill="#166534" font-size="11" text-anchor="middle">下次不再调用</text>
+
+  <line x1="380" y1="260" x2="380" y2="292" stroke="#d97706" stroke-width="2" marker-end="url(#s04b-amber)"/>
+  <text x="394" y="282" fill="#d97706" font-size="11" font-weight="600">否</text>
+
+  <rect x="270" y="296" width="220" height="56" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="380" y="318" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">调用 CLI</text>
+  <text x="380" y="338" fill="#92400e" font-size="11" text-anchor="middle">Codex 或 Grok</text>
+
+  <line x1="380" y1="352" x2="380" y2="376" stroke="#555" stroke-width="1.5" marker-end="url(#s04b-arrow)"/>
+
+  <rect x="250" y="380" width="260" height="44" rx="8" fill="#fff" stroke="#2563eb" stroke-width="1.5"/>
+  <text x="380" y="407" fill="#1e3a5f" font-size="12" font-weight="600" text-anchor="middle">再校验：OK，或第一条错误</text>
+</svg>

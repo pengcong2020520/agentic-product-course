@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="s05a-header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <marker id="s05a-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+    <marker id="s05a-purple" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+    <marker id="s05a-amber" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="460" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#s05a-header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#s05a-header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">一致性不够，就改规则</text>
+
+  <rect x="70" y="68" width="200" height="56" rx="8" fill="#f0f4ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="170" y="90" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">Codex · 主标注</text>
+  <text x="170" y="110" fill="#64748b" font-size="11" text-anchor="middle">460 条</text>
+
+  <rect x="490" y="68" width="200" height="56" rx="8" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="590" y="90" fill="#5b21b6" font-size="13" font-weight="600" text-anchor="middle">Grok · 复标</text>
+  <text x="590" y="110" fill="#7c3aed" font-size="11" text-anchor="middle">同一批 460 条</text>
+
+  <line x1="170" y1="124" x2="300" y2="168" stroke="#555" stroke-width="1.5" marker-end="url(#s05a-arrow)"/>
+  <line x1="590" y1="124" x2="460" y2="168" stroke="#555" stroke-width="1.5" marker-end="url(#s05a-arrow)"/>
+
+  <rect x="270" y="172" width="220" height="56" rx="8" fill="#fff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="380" y="196" fill="#5b21b6" font-size="14" font-weight="700" text-anchor="middle">按基因计算 κ</text>
+  <text x="380" y="214" fill="#64748b" font-size="11" text-anchor="middle">合格线 0.6</text>
+
+  <line x1="300" y1="228" x2="140" y2="276" stroke="#16a34a" stroke-width="1.5" marker-end="url(#s05a-arrow)"/>
+  <line x1="380" y1="228" x2="380" y2="276" stroke="#d97706" stroke-width="1.5" marker-end="url(#s05a-amber)"/>
+  <line x1="460" y1="228" x2="620" y2="276" stroke="#555" stroke-width="1.5" marker-end="url(#s05a-arrow)"/>
+
+  <rect x="24" y="280" width="220" height="64" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="134" y="306" fill="#166534" font-size="13" font-weight="600" text-anchor="middle">κ ≥ 0.6</text>
+  <text x="134" y="326" fill="#166534" font-size="11" text-anchor="middle">合格，可以统计</text>
+
+  <rect x="270" y="280" width="220" height="64" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="306" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">κ &lt; 0.6</text>
+  <text x="380" y="326" fill="#92400e" font-size="11" text-anchor="middle">改规则，只重标该基因</text>
+
+  <rect x="516" y="280" width="220" height="64" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="626" y="306" fill="#334155" font-size="13" font-weight="600" text-anchor="middle">关键分歧</text>
+  <text x="626" y="326" fill="#64748b" font-size="11" text-anchor="middle">进 Argilla 人工裁决</text>
+
+  <rect x="24" y="364" width="712" height="76" rx="6" fill="#f1f5f9"/>
+  <text x="40" y="390" fill="#334155" font-size="12">低于 0.6 的基因：改判定规则，只重标这一个基因，再算 κ。</text>
+  <text x="40" y="412" fill="#64748b" font-size="11">相关性 0.00 → 0.87 · 角色关系 0.18 → 0.71 · 投入程度 0.38 → 0.82 · 关系阶段 0.48 → 0.72</text>
+  <text x="40" y="430" fill="#64748b" font-size="11">风险信号 0.56 → 0.88</text>
+</svg>

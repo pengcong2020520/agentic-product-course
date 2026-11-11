@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 420" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="s05b-header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <marker id="s05b-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#555"/>
+    </marker>
+    <marker id="s05b-green" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="420" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#s05b-header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#s05b-header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">哪些分歧交给人</text>
+
+  <rect x="24" y="72" width="250" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="149" y="94" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">一级触点</text>
+  <text x="149" y="112" fill="#92400e" font-size="11" text-anchor="middle">完全没有交集</text>
+
+  <rect x="24" y="140" width="250" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="149" y="162" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">可解性</text>
+  <text x="149" y="180" fill="#92400e" font-size="11" text-anchor="middle">落在不同具体层</text>
+
+  <rect x="24" y="208" width="250" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="149" y="230" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">严重度</text>
+  <text x="149" y="248" fill="#92400e" font-size="11" text-anchor="middle">只要不同</text>
+
+  <rect x="24" y="276" width="250" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="149" y="298" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">相关性</text>
+  <text x="149" y="316" fill="#92400e" font-size="11" text-anchor="middle">两边对不上</text>
+
+  <line x1="274" y1="98" x2="360" y2="150" stroke="#555" stroke-width="1.5" marker-end="url(#s05b-arrow)"/>
+  <line x1="274" y1="166" x2="360" y2="166" stroke="#555" stroke-width="1.5" marker-end="url(#s05b-arrow)"/>
+  <line x1="274" y1="234" x2="360" y2="190" stroke="#555" stroke-width="1.5" marker-end="url(#s05b-arrow)"/>
+  <line x1="274" y1="302" x2="360" y2="196" stroke="#555" stroke-width="1.5" marker-end="url(#s05b-arrow)"/>
+
+  <rect x="364" y="136" width="160" height="72" rx="8" fill="#f3e8ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="444" y="166" fill="#5b21b6" font-size="14" font-weight="700" text-anchor="middle">Argilla</text>
+  <text x="444" y="188" fill="#7c3aed" font-size="11" text-anchor="middle">人来裁决</text>
+
+  <line x1="524" y1="172" x2="560" y2="172" stroke="#16a34a" stroke-width="1.5" marker-end="url(#s05b-green)"/>
+
+  <rect x="564" y="136" width="172" height="72" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="650" y="164" fill="#166534" font-size="13" font-weight="600" text-anchor="middle">拉回主标注</text>
+  <text x="650" y="186" fill="#166534" font-size="11" text-anchor="middle">再跑一遍校验</text>
+
+  <rect x="24" y="352" width="712" height="52" rx="6" fill="#f1f5f9"/>
+  <text x="40" y="374" fill="#334155" font-size="12">460 条里 89 条进入裁决，其中 47 条改动了主标注。</text>
+  <text x="40" y="394" fill="#64748b" font-size="12">拉回后校验不通过，命令失败，这批改动还不能当最终标签。</text>
+</svg>

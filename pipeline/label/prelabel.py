@@ -74,7 +74,7 @@ def main():
 
     client = OpenAI(api_key=os.environ["KIMI_API_KEY"], base_url=args.base_url, timeout=300, max_retries=0)
     rows = [json.loads(l) for l in open(args.src, encoding="utf-8")]
-    rows = [r for r in rows if not r["low_info"]]
+    rows = [r for r in rows if not r.get("low_info")]
     if args.limit:
         rows = rows[: args.limit]
     out = Path(args.out)
@@ -88,7 +88,12 @@ def main():
     batches = [todo[i: i + args.batch] for i in range(0, len(todo), args.batch)]
     finished = [0]
 
+    stop = threading.Event()
+    failed = [0]
+
     def run(batch):
+        if stop.is_set():
+            return
         user = json.dumps([{"id": r["id"], "app": r["app"], "rating": r["rating"], "text": r["text"]}
                            for r in batch], ensure_ascii=False)
         items, resp = {}, None
@@ -110,10 +115,18 @@ def main():
                         resp = chunk
                 items = {x.get("id"): x for x in json.loads("".join(parts))["items"]}
                 break
-            except Exception as exc:  # 网络、限流、格式错误都重试；三次失败则整批记为没能判定
+            except Exception as exc:  # 网络、限流、格式错误都重试
                 print(f"  批次 {batch[0]['id']} 第 {attempt + 1} 次失败：{exc}")
                 resp = None
+                if "insufficient balance" in str(exc) or "suspended" in str(exc):
+                    stop.set()  # 余额不足：停止派发新批次
+                    return
                 time.sleep(5 * (attempt + 1))
+        if not items:
+            # 整批失败不写入，下次运行会重新标注；不把"没调通"记成"没能判定"
+            with lock:
+                failed[0] += len(batch)
+            return
         with lock:
             if resp is not None and resp.usage:
                 usage["prompt"] += resp.usage.prompt_tokens
@@ -131,6 +144,8 @@ def main():
     with out.open("a", encoding="utf-8") as f, ThreadPoolExecutor(max_workers=args.workers) as pool:
         list(pool.map(run, batches))
     print("用量：", usage)
+    if failed[0] or stop.is_set():
+        print(f"未完成 {len(todo) - finished[0]} 条（整批失败 {failed[0]} 条{'，余额不足已停止' if stop.is_set() else ''}），重新运行即可续跑")
 
 
 if __name__ == "__main__":

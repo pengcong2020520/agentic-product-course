@@ -1,7 +1,7 @@
 """合并最终标注：主标注（Codex）的全量 + 双标样本，替换单独重标的基因，挂上裁决标记。
 
 规则见 docs/genome/annotation-protocol.md 第 5 节：最终标注以主标注为准；双标样本中关键基因分歧的
-样本标 needs_review，等人工裁决后用 apply_review 覆盖。
+样本标 needs_review，人工裁决后用 `review_argilla.py pull` 覆盖。
 
 用法：python pipeline/label/merge_final.py [--relabeled g17_risk] [--out data/labeled/genome-final.jsonl]
 """

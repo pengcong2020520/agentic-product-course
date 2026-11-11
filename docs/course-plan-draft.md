@@ -99,3 +99,5 @@
 - 原始数据：脚本爬取 App Store 中国区陪伴类应用公开评论（`pipeline/crawl/`）；不做模拟访谈；数据不进公开仓库。
 - 打标工具：Argilla（先试用）。
 - 打标维度体系命名为 **Agentic 产品基因图谱**（`docs/genome/`）。
+- 标注者：本机 Codex CLI 主标注全量，Grok CLI 独立复标 10% 分层样本；Kimi 不参与标注，只作为课程中读者使用的轻量模型
+- 标注规则与一致性结果见 `docs/genome/annotation-protocol.md`

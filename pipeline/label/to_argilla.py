@@ -3,7 +3,7 @@
 数据集的问题由 genome.json 生成（与预标脚本同一份定义）；预标结果作为 suggestion 挂在每条记录上，
 "没能判定"的基因不挂建议，并在 metadata 里标出，方便筛出来优先校对。
 
-用法：python pipeline/label/to_argilla.py [--name genome-v0.1] [--limit 200]
+用法：python pipeline/label/to_argilla.py [--name genome-v0.2.2] [--limit 200]
 环境变量：ARGILLA_API_URL（默认 http://localhost:6900）、ARGILLA_API_KEY
 """
 import argparse

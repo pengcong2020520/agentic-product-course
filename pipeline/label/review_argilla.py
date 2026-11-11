@@ -5,13 +5,14 @@
 环境变量：ARGILLA_API_URL（默认 http://localhost:6900）、ARGILLA_API_KEY
 """
 import argparse
+from copy import deepcopy
 import json
 import os
 from pathlib import Path
 
 import argilla as rg
 
-from check_labels import GENOME
+from check_labels import GENOME, check
 
 GENES = {g["id"]: g for g in GENOME["genes"]}
 REVIEW_GENES = ["relevant", "g5_touchpoint", "g15_solvable", "g16_severity"]
@@ -63,6 +64,48 @@ def push(args):
     print(f"已推送 {len(records)} 条待裁决样本 → Argilla 数据集 {NAME}")
 
 
+def apply_decision(labels, decision, raw_by_annotator, main="codex"):
+    """Apply a review without mutating inputs; retain a trace of dependent repairs."""
+    new_labels = deepcopy(labels)
+    notes = []
+    if decision.get("relevant") == "off_topic":
+        new_labels["relevant"] = "off_topic"
+        return new_labels, notes
+
+    others = [(name, raw) for name, raw in raw_by_annotator.items() if name != main]
+    if labels.get("relevant") == "off_topic" and decision.get("relevant") == "yes":
+        if others:
+            name, raw = others[0]
+            # Raw annotations also contain record metadata (such as id).
+            new_labels = deepcopy({k: v for k, v in raw.items() if k in GENES})
+            notes.append(f"filled_from={name}")
+        # Force full validation even if the other annotator also chose off_topic.
+        if not others or check({**new_labels, "relevant": "yes"}):
+            notes.append("incomplete")
+
+    new_labels.update(deepcopy(decision))
+    if "g5_touchpoint" in decision:
+        candidates = list(labels.get("g6_subtouch") or [])
+        for _, raw in others:
+            candidates.extend(raw.get("g6_subtouch") or [])
+        candidates = list(dict.fromkeys(candidates))
+        parents = new_labels["g5_touchpoint"] or []
+        subtouch = [value for value in candidates if value.split(".", 1)[0] in parents]
+        for value in candidates:
+            if value not in subtouch:
+                notes.append(f"g6_subtouch_removed={value}")
+        for parent in parents:
+            fallback = f"{parent}.other"
+            if (fallback in GENES["g6_subtouch"]["values"]
+                    and not any(value.split(".", 1)[0] == parent for value in subtouch)):
+                subtouch.append(fallback)
+        for value in subtouch:
+            if value not in (labels.get("g6_subtouch") or []):
+                notes.append(f"g6_subtouch_added={value}")
+        new_labels["g6_subtouch"] = subtouch
+    return new_labels, notes
+
+
 def pull(args):
     ds = client().datasets(NAME)
     decisions = {}
@@ -76,18 +119,33 @@ def pull(args):
     out = Path(args.decisions)
     out.write_text("".join(json.dumps({"id": k, "decision": v}, ensure_ascii=False) + "\n"
                            for k, v in decisions.items()), encoding="utf-8")
-    final = [json.loads(l) for l in open(args.final, encoding="utf-8")]
-    changed = 0
+    with open(args.final, encoding="utf-8") as source:
+        final = [json.loads(line) for line in source]
+    with open(args.merged, encoding="utf-8") as source:
+        raw_by_id = {rec["id"]: rec.get("raw", {}) for rec in map(json.loads, source)}
+    covered = changed = invalid = 0
     for rec in final:
         d = decisions.get(rec["id"])
         if not d:
             continue
-        before = dict(rec["labels"])
-        rec["labels"].update(d)
-        rec["review"] = {"decided": True, "before": {k: before.get(k) for k in d}}
-        changed += any(before.get(k) != v for k, v in d.items())
+        before = rec["labels"]
+        rec["labels"], notes = apply_decision(before, d, raw_by_id.get(rec["id"], {}))
+        overwritten = ["relevant"] if d.get("relevant") == "off_topic" else list(d)
+        overwritten.extend(k for k in dict.fromkeys([*before, *rec["labels"]])
+                           if k not in overwritten and before.get(k) != rec["labels"].get(k))
+        rec["review"] = {"decided": True, "before": {k: before.get(k) for k in overwritten},
+                         "notes": notes}
+        bad = check(rec["labels"])
+        if bad:
+            rec["review"]["invalid"] = bad
+            invalid += 1
+        covered += 1
+        changed += before != rec["labels"]
     Path(args.final).write_text("".join(json.dumps(r, ensure_ascii=False) + "\n" for r in final), encoding="utf-8")
-    print(f"拉回 {len(decisions)} 条裁决，其中 {changed} 条改动了主标注；已更新 {args.final}")
+    print(f"拉回 {len(decisions)} 条裁决；已覆盖条数：{covered}；改动主标注条数：{changed}；"
+          f"校验不通过条数：{invalid}；已更新 {args.final}")
+    if invalid:
+        raise SystemExit(1)
 
 
 def main():

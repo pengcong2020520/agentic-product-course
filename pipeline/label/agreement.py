@@ -17,21 +17,36 @@ from check_labels import GENOME, check
 GENES = {g["id"]: g for g in GENOME["genes"]}
 
 
-def load(path):
+def load(path, validate=True):
     p = Path(path)
     files = sorted(p.glob("*.jsonl")) if p.is_dir() else [p]
     out = {}
     for f in files:
-        for line in open(f, encoding="utf-8"):
-            if not line.strip():
-                continue
-            d = json.loads(line)
-            labels = d.get("labels", d)  # prelabel 输出包在 labels 里，复标直接是字段
-            if check(labels):  # 不合法：整条记为没能判定
-                out[d["id"]] = None
-            else:
-                out[d["id"]] = labels
+        with f.open(encoding="utf-8") as source:
+            for line in source:
+                if not line.strip():
+                    continue
+                d = json.loads(line)
+                labels = d.get("labels", d)  # prelabel 输出包在 labels 里，复标直接是字段
+                if validate and check(labels):  # 不合法：整条记为没能判定
+                    out[d["id"]] = None
+                else:
+                    out[d["id"]] = labels
     return out
+
+
+def apply_patch(annotations, gene, path):
+    """按 id 叠加一个基因；同一补丁内重复 id 取最后一条，每个 id 只计一次。"""
+    replacements = load(path, validate=False)
+    if any(gene not in labels for labels in replacements.values()):
+        raise ValueError("补丁记录缺少指定基因字段")
+    applied = 0
+    for rid, replacement in replacements.items():
+        labels = annotations.get(rid)
+        if labels is not None and labels.get("relevant") != "off_topic":
+            labels[gene] = replacement[gene]
+            applied += 1
+    return applied
 
 
 def cohen(a, b):
@@ -77,13 +92,34 @@ def r3(x):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--ann", action="append", required=True, help="名字=路径（文件或目录），第一个为主标注")
+    ap.add_argument("--patch", action="append", default=[],
+                    help="名字:基因=路径（JSONL 文件或目录），可重复；按参数顺序叠加，跳过 off_topic")
     ap.add_argument("--out", default="data/double/report")
     args = ap.parse_args()
 
     ann = {}
     for spec in args.ann:
         name, path = spec.split("=", 1)
-        ann[name] = load(path)
+        ann[name] = load(path, validate=False)
+    patches = []
+    for spec in args.patch:
+        try:
+            target, path = spec.split("=", 1)
+            name, gene = target.split(":", 1)
+        except ValueError:
+            ap.error("--patch 格式应为 名字:基因=路径")
+        if name not in ann or gene not in GENES or not path:
+            ap.error("--patch 必须指定已提供的标注者、有效基因与非空路径")
+        try:
+            applied = apply_patch(ann[name], gene, path)
+        except (ValueError, KeyError, TypeError):
+            ap.error("补丁必须是包含 id 和指定基因字段的合法 JSONL")
+        patches.append({"annotator": name, "gene": gene, "path": path, "applied": applied})
+    # 所有补丁叠加后再校验，允许重标修复原先不合法的基因。
+    for annotations in ann.values():
+        for rid, labels in annotations.items():
+            if check(labels):
+                annotations[rid] = None
     names = list(ann)
     sample = set.intersection(*(set(v) for v in ann.values() if v)) if all(ann.values()) else set()
     # 只统计三方都有记录的样本；任一方不合法 → 该样本没能判定
@@ -93,6 +129,8 @@ def main():
 
     report = {"annotators": names, "sample": len(sample), "usable": len(ids), "both_relevant": len(rel),
               "undetermined": undetermined, "genes": {}}
+    if args.patch:
+        report["patches"] = patches
     for gid, g in GENES.items():
         if g["type"] == "text":
             wrote = {n: sum("Agent 应当" in (ann[n][i].get(gid) or "") for i in rel) for n in names}

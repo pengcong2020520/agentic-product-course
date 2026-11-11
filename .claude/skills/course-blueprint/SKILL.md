@@ -24,34 +24,35 @@ description: >-
 
 把这三件事写成一份设计稿给负责人确认。路线以后一旦改动，立刻按第 4 节的"骨架文件清单"全部更新。
 
-## 2. 仓库骨架（第一周完成）
+## 2. 仓库骨架（参照 shareAI-lab/learn-claude-code）
 
 ```text
-README.md                 定位 → 快速开始 → 学习路线（按组列出每章：一句引语 + 一句说明）→ 三种学法 → 结构 → 验证
-stages/
-  introduction.md         导论：核心观点、产品终态（含结构图）、问题框架总表、章节表、怎么学
-  README.md               阶段总览：演进表（阶段 | 核心能力 | 新机制 | 端口）、每阶段加了什么、关键约束、快照修改规则
-  sNN-name/               每阶段一份完整快照：README.md、docs/design.md、lessons/、tests/、package.json …
-  verify.mjs              统一检查（见下）
-  build-roadmap.mjs       路线图由数据生成，带 --check
-  build-architecture.mjs  每章总架构图由数据生成并绑定代码模块，带 --check
-  build-changes.mjs       阶段增量（相邻快照的模块/接口/环境变量/迁移差异）自动生成
-scripts/privacy-check.mjs 公开仓库不得出现本机路径、邮箱、公网 IP、密钥；示例域名只用 example.com
-.github/workflows/ci.yml  每个阶段包 npm test + 文档检查 + 隐私检查
+README.md                 论点 → 模式图 → 每章一句格言 → 核心模式 → 学习路径（mermaid）→ 全部章节表 → 如何阅读 → 项目结构 → 学完之后
+sNN_名字/                 每章一个根目录文件夹（没有 s00，导论写在根 README）
+  README.md               章节正文（模板见 chapter-writing）
+  code.py                 本章独立可运行的实现（可用子命令），不 import 其他章节
+  images/                 SVG 图示（需要时；简单章 0–1 张，复杂章更多）
+  <本章资产>              例如 apps.json、genome.json、brief 模板、docker-compose.yaml
+tests/                    pytest；test_chapter_readmes.py 检查每章结构，test_repo_hygiene.py 检查隐私与链接，其余按章测试
+requirements.txt          全书依赖，统一锁定
+.env.example              模型与服务的环境变量占位（不写真实值）
+docs/                     调研与规划文档（不是章节正文）
+data/                     运行产物，.gitignore 忽略，不进仓库
+web/                      （后期）从根目录章节生成的课程站点
+.github/workflows/test.yml  pip install -r requirements.txt && python -m pytest tests -q
 ```
 
-`verify.mjs --docs-only` 至少检查：
-- 每章 README：标题格式、章节导航、七个固定小节（见 chapter-writing）、"对应 X 个问题"标注、关键代码逐行出自源码、相对链接存在；
-- 每章 design.md：固定七节顺序；
-- 导论：问题框架完整；
-- 图与增量是最新的（调用各 build 脚本的 --check）；
+`tests/test_chapter_readmes.py` 至少检查：
+- 章节数量与命名；每章有 README.md 与 code.py，code.py 能编译；
+- README 标题格式、导航行（当前章反引号、下一章链接）、引用块格言与"层"行；
+- 五个固定小节按顺序出现；工作原理里的代码段逐字出自本章 code.py；
 - **所有章节同一套规则，不给任何章节开特例**（特例会让格式漂移无法被发现）。
 
 ## 3. 约定
 
-- 阶段快照默认冻结；持续开发在单独的 `app/`。快照只回补影响教学正确性的问题，回补后重新生成课程素材。
+- 每章 code.py 独立可运行；后面章节需要前面的能力时复制一份，而不是 import。章节一经发布只回补影响教学正确性的问题。
 - 依赖版本全书锁定同一版本（在课程开头写明并全书锁定）。
-- 读者只需配置一次模型（`setup:model` 统一写入各阶段）。
+- 读者只需配置一次模型：根目录 `.env`（从 `.env.example` 复制）。
 - 资源门槛按"教程够用"定，不按商用；部署环境本身要留足余量（磁盘、内存）。
 - 全部中文；专有名词、协议方法名原样保留。
 
@@ -60,14 +61,13 @@ scripts/privacy-check.mjs 公开仓库不得出现本机路径、邮箱、公网
 路线（增删阶段、拆章、改分组、改一句话说明）变化时，这些地方必须同时改，最后用 `git grep` 查旧说法（"规划中""已完成"、旧阶段数、旧组名）：
 
 - 根 README 的学习路线与结构说明；
-- 导论：产品终态描述与结构图、问题框架总表的"在哪一章"、章节表、流程图；
-- 阶段总览：演进表、每阶段加了什么、关键约束；
-- 路线图数据（build-roadmap）与工作台/网站的分组；
-- 每章 README 的导航条、上一章的"下一章"、下一章的"要回答的问题"开头；
+- 根 README 的格言清单、学习路径图、全部章节表、项目结构；
+- 每章 README 的导航行、上一章的"接下来"、下一章的"问题"开头；
+- `tests/test_chapter_readmes.py` 中的章节数量；
 - 前文所有指向被改动章节的伏笔（"多用户时会怎样""延伸"等小节）。
 
 ## 5. 完成标准
 
 - 负责人确认了产品、问题框架、阶段划分与分组；
-- 骨架文件齐全，`verify.mjs --docs-only`、隐私检查、CI 在空内容时就能跑通；
+- 骨架文件齐全，`python -m pytest tests -q` 在章节只有占位 README 时就能跑通；
 - 第一章按 stage-delivery 完整走通一遍，再批量推进。

@@ -8,6 +8,96 @@ import re
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
+REQUIRED_SECTIONS = ['问题', '解决方案', '工作原理', '试一下', '接下来']
+
+
+def _check_chapter_sections(readme):
+    headings = []
+    fence = None
+    for line in readme.read_text(encoding='utf-8').splitlines():
+        if fence is not None:
+            if re.fullmatch(r' {0,3}' + re.escape(fence[0])
+                            + '{' + str(len(fence)) + r',}[ \t]*', line):
+                fence = None
+            continue
+        opening = re.match(r'^ {0,3}(`{3,}|~{3,})(.*)$', line)
+        if opening and (opening[1][0] == '~' or '`' not in opening[2]):
+            fence = opening[1]
+            continue
+        heading = re.match(r'^## (.+)$', line)
+        if heading:
+            headings.append(heading[1])
+
+    fixed = [heading for heading in headings if heading in REQUIRED_SECTIONS]
+    assert fixed == REQUIRED_SECTIONS, f'{readme}: 固定小节必须各出现一次且按顺序'
+    problem = headings.index('问题')
+    mechanism = headings.index('工作原理')
+    assert all(heading in REQUIRED_SECTIONS or problem < index < mechanism
+               for index, heading in enumerate(headings)), (
+        f'{readme}: 主题小节只能位于问题与工作原理之间'
+    )
+
+
+def _section_readme(tmp_path, sections):
+    readme = tmp_path / 'README.md'
+    readme.write_text('\n'.join(f'## {section}' for section in sections) + '\n',
+                      encoding='utf-8')
+    return readme
+
+
+@pytest.mark.parametrize('position', [1, 2])
+def test_topic_section_before_mechanism_passes(tmp_path, position):
+    sections = REQUIRED_SECTIONS.copy()
+    sections.insert(position, '主题小节')
+    _check_chapter_sections(_section_readme(tmp_path, sections))
+
+
+@pytest.mark.parametrize('position', [0, 3, 4, 5])
+def test_topic_section_outside_allowed_range_fails(tmp_path, position):
+    sections = REQUIRED_SECTIONS.copy()
+    sections.insert(position, '主题小节')
+    with pytest.raises(AssertionError, match='主题小节只能'):
+        _check_chapter_sections(_section_readme(tmp_path, sections))
+
+
+@pytest.mark.parametrize('section', REQUIRED_SECTIONS)
+def test_missing_fixed_section_fails(tmp_path, section):
+    sections = [heading for heading in REQUIRED_SECTIONS if heading != section]
+    with pytest.raises(AssertionError, match='固定小节必须'):
+        _check_chapter_sections(_section_readme(tmp_path, sections))
+
+
+@pytest.mark.parametrize('section', REQUIRED_SECTIONS)
+def test_duplicate_fixed_section_fails(tmp_path, section):
+    sections = REQUIRED_SECTIONS.copy()
+    sections.insert(sections.index(section), section)
+    with pytest.raises(AssertionError, match='固定小节必须'):
+        _check_chapter_sections(_section_readme(tmp_path, sections))
+
+
+@pytest.mark.parametrize('position', range(4))
+def test_reversed_fixed_sections_fail(tmp_path, position):
+    sections = REQUIRED_SECTIONS.copy()
+    sections[position:position + 2] = reversed(sections[position:position + 2])
+    with pytest.raises(AssertionError, match='固定小节必须'):
+        _check_chapter_sections(_section_readme(tmp_path, sections))
+
+
+@pytest.mark.parametrize('fence', ['```', '~~~', '````', '~~~~'])
+def test_fenced_headings_do_not_count(tmp_path, fence):
+    readme = _section_readme(tmp_path, REQUIRED_SECTIONS)
+    text = readme.read_text(encoding='utf-8')
+    # A different marker or a shorter run must not close the outer fence.
+    other_marker = '~~~' if fence[0] == '`' else '```'
+    block = f'{fence}markdown\n{other_marker}\n{fence[:-1]}\n## 工作原理\n## 主题小节\n{fence}\n'
+    readme.write_text(block + text + block, encoding='utf-8')
+    _check_chapter_sections(readme)
+
+    # A fenced heading cannot replace the required real heading either.
+    readme.write_text(block + text.replace('## 工作原理\n', '') + block,
+                      encoding='utf-8')
+    with pytest.raises(AssertionError, match='固定小节必须'):
+        _check_chapter_sections(readme)
 
 
 def _without_indent(line, indent):
@@ -184,8 +274,7 @@ def test_chapter_readmes(tmp_path):
                 assert item == number
         assert re.search(r'^> \*".+"\* — .+。$', text, re.MULTILINE)
         assert re.search(r'^> \*\*[^*\n]+层\*\*：.+', text, re.MULTILINE)
-        headings = re.findall(r'^## (.+)$', text, re.MULTILINE)
-        assert headings == ['问题', '解决方案', '工作原理', '试一下', '接下来']
+        _check_chapter_sections(readme)
         py_compile.compile(str(code), cfile=str(tmp_path / f'{chapter.name}.pyc'), doraise=True)
         doc = ast.get_docstring(ast.parse(code.read_text(encoding='utf-8')))
         assert doc and chapter.name in doc and 'Usage:' in doc

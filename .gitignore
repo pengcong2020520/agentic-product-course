@@ -7,7 +7,7 @@ node_modules/
 briefs/
 .private/
 data/
-.venv/
+.venv
 __pycache__/
 *.pyc
 

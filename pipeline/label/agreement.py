@@ -120,28 +120,27 @@ def main():
                                     "mean_jaccard": r3(sum(jac) / len(jac)) if jac else None}
             report["genes"][gid] = {"pairwise": pair}
 
+    # 最终标注取主标注（第一个标注者）；只有关键基因分歧进入人工裁决（规则见 annotation-protocol.md 第 5 节）
+    main_name = names[0]
     merged = []
     for i in ids:
-        out, review = {}, []
-        for gid, g in GENES.items():
-            vals = [ann[n][i].get(gid) for n in names]
-            if g["type"] in ("single", "rating"):
-                top, cnt = Counter(vals).most_common(1)[0]
-                out[gid] = top if cnt >= 2 else None
-                if gid in ("g5_touchpoint", "g15_solvable", "g16_severity") and cnt < 2:
-                    review.append(gid)
-            elif g["type"] == "multi":
-                c = Counter(x for v in vals for x in (v or []))
-                out[gid] = sorted(k for k, v in c.items() if v >= 2)
-                if gid == "g5_touchpoint" and not out[gid]:
-                    review.append(gid)
-            else:
-                out[gid] = [v for v in vals if v]
-        if any("p0" == ann[n][i].get("g16_severity") or ann[n][i].get("g17_risk") for n in names):
-            review.append("red_line")
-        if any("Agent 应当" in (ann[n][i].get("g13_expected") or "") for n in names):
-            review.append("agent_expectation")
-        merged.append({"id": i, "labels": out, "needs_review": sorted(set(review)),
+        main = ann[main_name][i]
+        review = []
+        if all(ann[n][i].get("relevant") == "yes" for n in names):
+            # G5：主次不同但有交集算部分一致，只有完全没有交集才裁决
+            sets = [set(ann[n][i].get("g5_touchpoint") or []) for n in names]
+            if not set.intersection(*sets):
+                review.append("g5_touchpoint")
+            # G15："多层共同"与某一层不同属于部分一致，只有两个具体层不同才裁决
+            vals = {ann[n][i].get("g15_solvable") for n in names}
+            if len(vals) > 1 and "mixed" not in vals:
+                review.append("g15_solvable")
+            # G16：严重度决定优先级，任何不一致都裁决
+            if len({ann[n][i].get("g16_severity") for n in names}) > 1:
+                review.append("g16_severity")
+        elif len({ann[n][i].get("relevant") for n in names}) > 1:
+            review.append("relevant")
+        merged.append({"id": i, "labels": main, "needs_review": review,
                        "raw": {n: ann[n][i] for n in names}})
     report["needs_review"] = sum(bool(m["needs_review"]) for m in merged)
 

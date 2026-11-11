@@ -1,0 +1,4 @@
+argilla>=2.8
+openai>=1.50
+requests>=2.31
+pytest>=8

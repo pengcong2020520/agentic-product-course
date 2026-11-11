@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="s04a-header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <marker id="s04a-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#2563eb"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="400" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#s04a-header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#s04a-header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">批量标注 — 模型判断，脚本搬运</text>
+
+  <rect x="16" y="72" width="120" height="64" rx="8" fill="#f0f4ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="76" y="98" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">待标评论</text>
+  <text x="76" y="118" fill="#64748b" font-size="11" text-anchor="middle">4,557 条</text>
+  <line x1="136" y1="104" x2="156" y2="104" stroke="#2563eb" stroke-width="1.5" marker-end="url(#s04a-arrow)"/>
+
+  <rect x="160" y="72" width="120" height="64" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="220" y="98" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">切成小块</text>
+  <text x="220" y="118" fill="#64748b" font-size="11" text-anchor="middle">每块 50 条</text>
+  <line x1="280" y1="104" x2="300" y2="104" stroke="#2563eb" stroke-width="1.5" marker-end="url(#s04a-arrow)"/>
+
+  <rect x="304" y="72" width="120" height="64" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="364" y="98" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">任务说明</text>
+  <text x="364" y="118" fill="#64748b" font-size="11" text-anchor="middle">brief</text>
+  <line x1="424" y1="104" x2="444" y2="104" stroke="#2563eb" stroke-width="1.5" marker-end="url(#s04a-arrow)"/>
+
+  <rect x="448" y="72" width="136" height="64" rx="8" fill="#fff" stroke="#2563eb" stroke-width="2"/>
+  <text x="516" y="98" fill="#1e3a5f" font-size="13" font-weight="600" text-anchor="middle">逐条判断</text>
+  <text x="516" y="118" fill="#64748b" font-size="11" text-anchor="middle">Codex / Grok</text>
+  <line x1="584" y1="104" x2="604" y2="104" stroke="#2563eb" stroke-width="1.5" marker-end="url(#s04a-arrow)"/>
+
+  <rect x="608" y="72" width="136" height="64" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="676" y="98" fill="#166534" font-size="13" font-weight="600" text-anchor="middle">校验</text>
+  <text x="676" y="118" fill="#166534" font-size="11" text-anchor="middle">没有错误才 OK</text>
+
+  <rect x="16" y="176" width="220" height="72" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="126" y="204" fill="#334155" font-size="13" font-weight="600" text-anchor="middle">Codex · 主标注</text>
+  <text x="126" y="226" fill="#64748b" font-size="11" text-anchor="middle">全量 82 块 + 双标 10 块</text>
+
+  <rect x="270" y="176" width="220" height="72" rx="8" fill="#f8fafc" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="380" y="204" fill="#334155" font-size="13" font-weight="600" text-anchor="middle">Grok · 复标</text>
+  <text x="380" y="226" fill="#64748b" font-size="11" text-anchor="middle">双标样本 10 块</text>
+
+  <rect x="524" y="176" width="220" height="72" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="634" y="204" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">合并</text>
+  <text x="634" y="226" fill="#92400e" font-size="11" text-anchor="middle">主标注盖上单基因重标</text>
+
+  <rect x="16" y="272" width="728" height="104" rx="8" fill="#f1f5f9"/>
+  <text x="32" y="302" fill="#334155" font-size="12">已通过校验的块自动跳过。同时最多 5 个并发。</text>
+  <text x="32" y="326" fill="#334155" font-size="12">模型按规范逐条判断。脚本再查输出文件，没有错误才记 OK。</text>
+  <text x="32" y="350" fill="#64748b" font-size="12">结果：82 块全量 + 10 块双标，全部校验通过。</text>
+</svg>

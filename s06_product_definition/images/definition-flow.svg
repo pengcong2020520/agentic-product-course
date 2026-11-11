@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 500" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="s06-header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <marker id="s06-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#0f766e"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="500" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#s06-header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#s06-header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">让分布替你拍板</text>
+
+  <rect x="250" y="68" width="260" height="52" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="2"/>
+  <text x="380" y="90" fill="#115e59" font-size="13" font-weight="600" text-anchor="middle">已标注样本</text>
+  <text x="380" y="108" fill="#0f766e" font-size="11" text-anchor="middle">相关 4,209 条 · 十八个基因</text>
+
+  <line x1="380" y1="120" x2="380" y2="144" stroke="#0f766e" stroke-width="1.5" marker-end="url(#s06-arrow)"/>
+
+  <rect x="24" y="152" width="220" height="72" rx="8" fill="#fff" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="134" y="180" fill="#115e59" font-size="13" font-weight="600" text-anchor="middle">整体分布</text>
+  <text x="134" y="202" fill="#64748b" font-size="11" text-anchor="middle">genome-report</text>
+
+  <rect x="270" y="152" width="220" height="72" rx="8" fill="#fff" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="380" y="180" fill="#115e59" font-size="13" font-weight="600" text-anchor="middle">人群切片</text>
+  <text x="380" y="202" fill="#64748b" font-size="11" text-anchor="middle">segment-report</text>
+
+  <rect x="516" y="152" width="220" height="72" rx="8" fill="#fff" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="626" y="176" fill="#115e59" font-size="13" font-weight="600" text-anchor="middle">行为主题</text>
+  <text x="626" y="196" fill="#64748b" font-size="11" text-anchor="middle">821 条 Agent 应当</text>
+  <text x="626" y="212" fill="#64748b" font-size="11" text-anchor="middle">归成 24 个主题</text>
+
+  <line x1="134" y1="224" x2="300" y2="268" stroke="#0f766e" stroke-width="1.5" marker-end="url(#s06-arrow)"/>
+  <line x1="380" y1="224" x2="380" y2="268" stroke="#0f766e" stroke-width="1.5" marker-end="url(#s06-arrow)"/>
+  <line x1="626" y1="224" x2="460" y2="268" stroke="#0f766e" stroke-width="1.5" marker-end="url(#s06-arrow)"/>
+
+  <rect x="145" y="272" width="470" height="56" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="296" fill="#92400e" font-size="12" font-weight="700" text-anchor="middle">命中样本 × P0+P1 比例 × 与首要用户的相关性</text>
+  <text x="380" y="314" fill="#92400e" font-size="11" text-anchor="middle">三列一起看，再决定做不做</text>
+
+  <line x1="380" y1="328" x2="380" y2="352" stroke="#0f766e" stroke-width="1.5" marker-end="url(#s06-arrow)"/>
+
+  <rect x="230" y="356" width="300" height="52" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="380" y="376" fill="#166534" font-size="13" font-weight="600" text-anchor="middle">definition.md</text>
+  <text x="380" y="396" fill="#166534" font-size="11" text-anchor="middle">每句附条数与样本 id</text>
+
+  <rect x="24" y="428" width="340" height="52" rx="8" fill="#f0fdfa" stroke="#0f766e" stroke-width="1.5"/>
+  <text x="194" y="450" fill="#115e59" font-size="13" font-weight="600" text-anchor="middle">陪伴向 708 条</text>
+  <text x="194" y="468" fill="#0f766e" font-size="11" text-anchor="middle">一半没有提出问题</text>
+
+  <rect x="396" y="428" width="340" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="566" y="450" fill="#92400e" font-size="13" font-weight="600" text-anchor="middle">剧情玩家 216 条</text>
+  <text x="566" y="468" fill="#92400e" font-size="11" text-anchor="middle">P0+P1 占 60.6%</text>
+</svg>

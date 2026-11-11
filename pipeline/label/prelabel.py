@@ -20,17 +20,19 @@ from openai import OpenAI
 
 HERE = Path(__file__).parent
 GENOME = json.loads((HERE / "genome.json").read_text(encoding="utf-8"))
-SPEC = (HERE.parent.parent / "docs/genome/agentic-product-genome-v0.1.md").read_text(encoding="utf-8")
+SPEC = (HERE.parent.parent / GENOME["spec"]).read_text(encoding="utf-8")
+
+EXAMPLE = json.dumps({"id": "样本 id", **{g["id"]: {"single": "<值>", "multi": ["<值>"], "rating": 2, "text": ""}[g["type"]]
+                                         for g in GENOME["genes"]}}, ensure_ascii=False)
 
 SYSTEM = f"""你是用户研究标注员。按下面的《Agentic 产品基因图谱》标注规范，给每条用户评论打标签。
 看不出来就用 unknown 或留空，不要猜。只输出 JSON。
 
 {SPEC}
 
-输出格式：{{"items": [{{"id": "...", "relevant": "yes|off_topic", "g1_user": [...], "g2_motive": [...],
-"g3_touchpoint": [...], "g4_emotion": "...", "g4_intensity": 1, "g5_voice_type": "...", "g6_stage": "...",
-"g7_expected": "Agent 应当……或空字符串", "g8_solvable": "...", "g9_risk": [...]}}]}}
-所有取值必须是规范里的英文值。relevant 为 off_topic 时其余字段可省略。"""
+输出格式：{{"items": [{EXAMPLE}]}}
+每个 item 必须包含上例中的全部字段（single 填一个值，multi 填数组，rating 填 1-3，text 填字符串）。
+所有取值必须是规范里的英文值；多选基因至少给一个值（看不出来用 unknown 或 none）；g6_subtouch 只能选所选 g5_touchpoint 之下的二级值。relevant 为 off_topic 时其余字段可省略。"""
 
 
 def validate(raw):
@@ -42,8 +44,11 @@ def validate(raw):
         if t == "single":
             ok = v in g["values"]
         elif t == "multi":
-            ok = isinstance(v, list) and all(x in g["values"] for x in v) and (v or g.get("optional")) \
+            ok = isinstance(v, list) and all(x in g["values"] for x in v) and bool(v or g.get("optional")) \
                  and len(v) <= g.get("max", 99)
+            if ok and g.get("parent"):  # 二级必须落在所选一级之下
+                parents = raw.get(g["parent"]) or []
+                ok = all(x.split(".")[0] in parents for x in v)
         elif t == "rating":
             ok = v in g["values"]
         else:
@@ -60,14 +65,14 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--src", default="data/clean/reviews.jsonl")
     ap.add_argument("--out", default="data/labeled/prelabels.jsonl")
-    ap.add_argument("--model", default=os.environ.get("PRELABEL_MODEL", "kimi-k3.1-pro"))
+    ap.add_argument("--model", default=os.environ.get("PRELABEL_MODEL", "kimi-k2.7-code-highspeed"))
     ap.add_argument("--base-url", default=os.environ.get("PRELABEL_BASE_URL", "https://api.moonshot.cn/v1"))
-    ap.add_argument("--batch", type=int, default=10)
+    ap.add_argument("--batch", type=int, default=5)
     ap.add_argument("--limit", type=int, default=0, help="只标前 N 条（试跑用）")
     ap.add_argument("--workers", type=int, default=4, help="并发请求数")
     args = ap.parse_args()
 
-    client = OpenAI(api_key=os.environ["KIMI_API_KEY"], base_url=args.base_url)
+    client = OpenAI(api_key=os.environ["KIMI_API_KEY"], base_url=args.base_url, timeout=300, max_retries=0)
     rows = [json.loads(l) for l in open(args.src, encoding="utf-8")]
     rows = [r for r in rows if not r["low_info"]]
     if args.limit:
@@ -89,12 +94,21 @@ def main():
         items, resp = {}, None
         for attempt in range(3):
             try:
-                resp = client.chat.completions.create(
+                # 流式请求：模型推理较久，非流式长时间没有数据会被当成超时断开
+                stream = client.chat.completions.create(
                     model=args.model,
                     messages=[{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
                     response_format={"type": "json_object"},
+                    stream=True,
+                    stream_options={"include_usage": True},
                 )
-                items = {x.get("id"): x for x in json.loads(resp.choices[0].message.content)["items"]}
+                parts, resp = [], None
+                for chunk in stream:
+                    if chunk.choices and chunk.choices[0].delta.content:
+                        parts.append(chunk.choices[0].delta.content)
+                    if chunk.usage:
+                        resp = chunk
+                items = {x.get("id"): x for x in json.loads("".join(parts))["items"]}
                 break
             except Exception as exc:  # 网络、限流、格式错误都重试；三次失败则整批记为没能判定
                 print(f"  批次 {batch[0]['id']} 第 {attempt + 1} 次失败：{exc}")

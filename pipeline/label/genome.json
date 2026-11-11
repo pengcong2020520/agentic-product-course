@@ -1,16 +1,325 @@
 {
-  "version": "0.1",
-  "genes": [
-    {"id": "relevant", "title": "是否与陪伴产品相关", "type": "single", "values": {"yes": "相关", "off_topic": "不相关（跳过其余基因）"}},
-    {"id": "g1_user", "title": "G1 用户画像", "type": "multi", "values": {"dream_partner": "梦女/乙女向", "creator": "角色创作者", "story_player": "剧情玩家", "confider": "倾诉者", "power_user": "进阶玩家", "tool_user": "工具型用户", "minor_hint": "疑似未成年", "unknown": "不明"}},
-    {"id": "g2_motive", "title": "G2 使用动机", "type": "multi", "values": {"companionship": "情感陪伴/精神寄托", "romance": "亲密关系想象", "roleplay": "剧情扮演", "pastime": "打发时间", "creation": "创作与分享", "utility": "实用问答", "unknown": "不明"}},
-    {"id": "g3_touchpoint", "title": "G3 体验触点（最多3个，按主次）", "type": "multi", "max": 3, "values": {"persona": "人设一致", "memory": "记忆与连续性", "dialogue": "对话质量", "agency": "主动与推进", "moderation": "内容审核", "voice": "语音", "creation_tool": "创作工具", "play_feature": "玩法功能", "monetization": "商业化", "reliability": "稳定与数据", "platform": "平台适配", "lifecycle": "功能下线/迁移"}},
-    {"id": "g4_emotion", "title": "G4 情绪", "type": "single", "values": {"delight": "喜爱", "satisfied": "满意", "neutral": "中性", "disappointed": "失望", "angry": "愤怒", "anxious": "害怕失去"}},
-    {"id": "g4_intensity", "title": "G4 情绪强度", "type": "rating", "values": [1, 2, 3]},
-    {"id": "g5_voice_type", "title": "G5 声音类型", "type": "single", "values": {"problem": "问题反馈", "request": "功能请求", "expectation": "对AI行为的期望", "praise": "价值肯定", "comparison": "竞品/旧版对比"}},
-    {"id": "g6_stage", "title": "G6 关系阶段", "type": "single", "values": {"first_try": "初次体验", "ongoing": "持续使用", "veteran": "老用户", "churning": "流失/准备离开", "unknown": "不明"}},
-    {"id": "g7_expected", "title": "G7 期望的 Agent 行为（Agent 应当……，可为空）", "type": "text"},
-    {"id": "g8_solvable", "title": "G8 Agent 可解性", "type": "single", "values": {"agent": "Agent 设计", "platform": "中台能力", "business": "商业与运营", "mixed": "多层共同"}},
-    {"id": "g9_risk", "title": "G9 风险信号（可为空）", "type": "multi", "optional": true, "values": {"minor": "未成年迹象", "dependency": "强情感依赖", "billing_dispute": "扣费争议", "data_loss": "数据丢失"}}
-  ]
+ "version": "0.2",
+ "spec": "docs/genome/agentic-product-genome-v0.2.md",
+ "genes": [
+  {
+   "id": "relevant",
+   "title": "G0 是否与陪伴产品相关",
+   "type": "single",
+   "values": {
+    "yes": "相关",
+    "off_topic": "不相关（跳过其余基因）"
+   }
+  },
+  {
+   "id": "g1_user",
+   "title": "G1 用户画像",
+   "type": "multi",
+   "values": {
+    "dream_partner": "梦女/乙女向",
+    "creator": "角色创作者",
+    "story_player": "剧情玩家",
+    "confider": "倾诉者",
+    "power_user": "进阶玩家",
+    "tool_user": "工具型用户",
+    "minor_hint": "疑似未成年",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g2_motive",
+   "title": "G2 使用动机",
+   "type": "multi",
+   "values": {
+    "companionship": "陪伴不孤单",
+    "emotional_support": "情绪安抚",
+    "romance": "亲密关系想象",
+    "roleplay": "剧情扮演",
+    "escape": "解压/逃离现实",
+    "pastime": "打发时间",
+    "creation": "创作与分享",
+    "social": "社区与社交",
+    "utility": "实用问答",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g3_relation",
+   "title": "G3 角色关系",
+   "type": "multi",
+   "values": {
+    "lover": "恋人",
+    "friend": "朋友/知己",
+    "family": "家人",
+    "idol": "偶像/梦角",
+    "story_npc": "剧情角色",
+    "mentor": "导师/助手",
+    "pet": "宠物/萌物",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g4_investment",
+   "title": "G4 投入程度",
+   "type": "single",
+   "values": {
+    "trial": "试用",
+    "regular": "日常使用",
+    "heavy": "重度/长期",
+    "paying": "付费用户",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g5_touchpoint",
+   "title": "G5 体验触点·一级（最多3个）",
+   "type": "multi",
+   "max": 3,
+   "values": {
+    "persona": "人设",
+    "memory": "记忆",
+    "dialogue": "对话质量",
+    "agency": "主动与推进",
+    "moderation": "内容审核",
+    "voice": "语音",
+    "creation_tool": "创作工具",
+    "play_feature": "玩法功能",
+    "monetization": "商业化",
+    "reliability": "稳定与数据",
+    "platform": "平台适配",
+    "lifecycle": "下线与迁移",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g6_subtouch",
+   "title": "G6 体验触点·二级（须在一级之下）",
+   "type": "multi",
+   "optional": true,
+   "parent": "g5_touchpoint",
+   "values": {
+    "persona.ooc": "人设漂移、\"突然换了个人\"",
+    "persona.homogenized": "角色同质化、\"每个人设聊出来都一样\"",
+    "persona.setting_ignored": "关系或背景设定被无视（\"恋人变成兄弟\"）",
+    "persona.intensity_off": "性格强度偏差（设定冷淡却过度热情、刻薄）",
+    "persona.gaze_bias": "性别向偏差、\"男凝\"",
+    "persona.likeness": "活人感 / 真人感（正向或负向）",
+    "memory.in_session": "同一会话里转头就忘",
+    "memory.cross_session": "跨会话失忆、隔天不记得",
+    "memory.profile_unused": "用户设定（名字、身份）没被使用",
+    "memory.contradiction": "前后矛盾、剧情接不上",
+    "memory.long_term_request": "希望有长期记忆 / 记忆表格",
+    "dialogue.ai_flavor": "AI 味、人机感、做作",
+    "dialogue.repetition": "重复、固定口癖、执念某个词",
+    "dialogue.verbosity": "冗长、描写过度、回复太长",
+    "dialogue.irrelevant": "答非所问、逻辑对不上",
+    "dialogue.tone_hostile": "语气刻薄、怼用户",
+    "dialogue.style_pollution": "颜文字、格式等风格污染",
+    "dialogue.language": "中文表达差、翻译腔",
+    "dialogue.factual": "事实错误、知识过时",
+    "agency.plot_drive": "主动推进剧情（正向或不足）",
+    "agency.proactive_care": "主动关心、主动发消息",
+    "agency.overreach": "过度主动、强行推进、乱判失败",
+    "agency.passive": "被动、只会接话、无聊",
+    "moderation.false_positive": "日常对话被误拦",
+    "moderation.deflection": "\"我们换个话题吧\"",
+    "moderation.creation_rejected": "创作 / 上传被判违规",
+    "moderation.too_loose": "希望更严格（如未成年保护）",
+    "voice.tts_quality": "配音音色、声音难听或好听",
+    "voice.call_request": "希望语音通话 / 更多语音",
+    "voice.asr_error": "语音识别异常",
+    "voice.no_audio": "没声音、加载失败",
+    "creation_tool.persona_editor": "人设编辑、改不了设定",
+    "creation_tool.media": "头像、立绘、皮肤、图片",
+    "creation_tool.manage": "删除、找回、管理角色",
+    "creation_tool.advanced": "预设、正则、世界书、自定义 API",
+    "play_feature.phone_sim": "小手机",
+    "play_feature.moments": "朋友圈",
+    "play_feature.diary": "日记",
+    "play_feature.gift": "转账、礼物",
+    "play_feature.story_mode": "故事 / 剧情模式",
+    "play_feature.discovery": "广场、搜索、推荐、浏览记录",
+    "monetization.quota": "聊天次数、撤回 / 回溯次数限制",
+    "monetization.price": "会员、月卡太贵",
+    "monetization.ads": "广告多、关不掉",
+    "monetization.unexpected_charge": "莫名扣费、自动续费",
+    "monetization.early_paywall": "一上来就收费、没有试用",
+    "monetization.economy": "签到、糖果、金币等虚拟货币",
+    "reliability.crash": "闪退、卡顿",
+    "reliability.login": "登录、验证码、账号",
+    "reliability.network": "网络错误、API 报错",
+    "reliability.message_lost": "消息被吞、回复空白",
+    "reliability.data_lost": "聊天记录、角色、会员丢失",
+    "platform.tablet": "iPad 适配",
+    "platform.multi_device": "多端登录",
+    "platform.os_version": "系统版本不兼容",
+    "platform.input": "输入框、光标、输入法",
+    "lifecycle.feature_removed": "功能或角色下线",
+    "lifecycle.model_change": "换模型、\"降智\"",
+    "lifecycle.migration": "被迫迁移到别的产品",
+    "persona.other": "其他（人设）",
+    "memory.other": "其他（记忆）",
+    "dialogue.other": "其他（对话质量）",
+    "agency.other": "其他（主动与推进）",
+    "moderation.other": "其他（内容审核）",
+    "voice.other": "其他（语音）",
+    "creation_tool.other": "其他（创作工具）",
+    "play_feature.other": "其他（玩法功能）",
+    "monetization.other": "其他（商业化）",
+    "reliability.other": "其他（稳定与数据）",
+    "platform.other": "其他（平台适配）",
+    "lifecycle.other": "其他（下线与迁移）"
+   }
+  },
+  {
+   "id": "g7_trigger",
+   "title": "G7 触发情境",
+   "type": "multi",
+   "values": {
+    "after_update": "更新后",
+    "first_use": "首次使用/注册",
+    "long_chat": "长时间对话后",
+    "payment": "付费时",
+    "creating": "创作/上传时",
+    "returning": "回归后",
+    "daily": "日常使用中",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g8_emotion",
+   "title": "G8 情绪",
+   "type": "single",
+   "values": {
+    "delight": "喜爱",
+    "satisfied": "满意",
+    "neutral": "中性",
+    "disappointed": "失望",
+    "angry": "愤怒",
+    "anxious": "害怕失去"
+   }
+  },
+  {
+   "id": "g8_intensity",
+   "title": "G8 情绪强度",
+   "type": "rating",
+   "values": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "id": "g9_voice_type",
+   "title": "G9 声音类型",
+   "type": "single",
+   "values": {
+    "problem": "问题反馈",
+    "request": "功能请求",
+    "expectation": "对AI行为的期望",
+    "praise": "价值肯定",
+    "comparison": "竞品/旧版对比"
+   }
+  },
+  {
+   "id": "g10_stage",
+   "title": "G10 关系阶段",
+   "type": "single",
+   "values": {
+    "first_try": "初次体验",
+    "ongoing": "持续使用",
+    "veteran": "老用户对比从前",
+    "churning": "流失/准备离开",
+    "unknown": "不明"
+   }
+  },
+  {
+   "id": "g11_value",
+   "title": "G11 情感价值",
+   "type": "multi",
+   "values": {
+    "aliveness": "活人感",
+    "reliance": "精神寄托",
+    "soothing": "治愈/安抚",
+    "not_alone": "不孤单",
+    "immersion": "沉浸/代入",
+    "fantasy": "梦想成真",
+    "achievement": "创作成就",
+    "fun": "好玩",
+    "none": "未提及"
+   }
+  },
+  {
+   "id": "g12_competitor",
+   "title": "G12 竞品参照",
+   "type": "multi",
+   "values": {
+    "xingye": "星野",
+    "maoxiang": "猫箱",
+    "doubao": "豆包",
+    "zhumengdao": "筑梦岛",
+    "glow": "Glow",
+    "tavern": "酒馆/SillyTavern",
+    "other": "其他",
+    "none": "未提及"
+   }
+  },
+  {
+   "id": "g13_expected",
+   "title": "G13 期望行为（Agent 应当…… / 产品应当……；可多句，可为空）",
+   "type": "text"
+  },
+  {
+   "id": "g14_capability",
+   "title": "G14 能力归属",
+   "type": "multi",
+   "values": {
+    "cap.persona": "人设与角色资产",
+    "cap.memory": "记忆基建",
+    "cap.dialogue": "回复编排",
+    "cap.proactive": "定时与主动触达",
+    "cap.moderation": "审核策略",
+    "cap.voice": "语音服务",
+    "cap.creation": "创作工具",
+    "cap.model": "模型服务",
+    "cap.runtime": "运行底座与数据可靠",
+    "cap.billing": "计费与权益",
+    "none": "无需能力"
+   }
+  },
+  {
+   "id": "g15_solvable",
+   "title": "G15 可解性",
+   "type": "single",
+   "values": {
+    "agent": "Agent 设计",
+    "platform": "中台能力",
+    "business": "商业与运营",
+    "mixed": "多层共同"
+   }
+  },
+  {
+   "id": "g16_severity",
+   "title": "G16 严重度",
+   "type": "single",
+   "values": {
+    "p0": "P0 流失/扣费/丢数据",
+    "p1": "P1 核心体验失败",
+    "p2": "P2 轻微/建议",
+    "none": "无问题"
+   }
+  },
+  {
+   "id": "g17_risk",
+   "title": "G17 风险信号（可为空）",
+   "type": "multi",
+   "optional": true,
+   "values": {
+    "minor": "未成年迹象",
+    "dependency": "强情感依赖",
+    "billing_dispute": "扣费争议",
+    "data_loss": "数据丢失"
+   }
+  }
+ ]
 }

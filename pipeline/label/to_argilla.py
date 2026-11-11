@@ -15,7 +15,7 @@ import argilla as rg
 
 HERE = Path(__file__).parent
 GENOME = json.loads((HERE / "genome.json").read_text(encoding="utf-8"))
-SPEC_URL = "docs/genome/agentic-product-genome-v0.1.md"
+SPEC_URL = GENOME["spec"]
 
 
 def question(g):

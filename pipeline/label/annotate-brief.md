@@ -1,9 +1,9 @@
-# 任务：按《Agentic 产品基因图谱 v0.2.1》独立标注一批用户评论
+# 任务：按《Agentic 产品基因图谱 v0.2.2》独立标注一批用户评论
 
 工作目录 = 项目根目录。只写 `{OUT}`，不改任何其他文件，不 git commit，不安装依赖。
 
 ## 先读
-1. `docs/genome/agentic-product-genome-v0.2.md`（标注规范 v0.2.1，必须完整读完，尤其是各基因的"判定规则"）
+1. `docs/genome/agentic-product-genome-v0.2.md`（标注规范 v0.2.2，必须完整读完，尤其是各基因的"判定规则"）
 2. `pipeline/label/genome.json`（每个基因的 id、类型与合法取值）
 3. `docs/genome/annotation-protocol.md` 第 3 节（复标者规则）
 

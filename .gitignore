@@ -13,3 +13,4 @@ __pycache__/
 
 # 课程素材（种子材料，只在本地）
 /agentic-product-course/
+.worktrees/

@@ -1,0 +1,73 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 460" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="header" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4c1d95"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+    <marker id="arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#7c3aed"/>
+    </marker>
+  </defs>
+
+  <rect width="760" height="460" fill="#fafbfc" rx="8"/>
+  <rect x="0" y="0" width="760" height="48" fill="url(#header)" rx="8"/>
+  <rect x="0" y="40" width="760" height="8" fill="url(#header)"/>
+  <text x="380" y="30" fill="#fff" font-size="16" font-weight="700" text-anchor="middle">基因图谱 — 人、事、解，十八条基因</text>
+
+  <rect x="40" y="72" width="200" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="140" y="98" fill="#5b21b6" font-size="13" font-weight="700" text-anchor="middle">140 条开放编码</text>
+  <text x="140" y="118" fill="#7c3aed" font-size="11" text-anchor="middle">维度从评论里长出来</text>
+
+  <line x1="240" y1="104" x2="278" y2="104" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="280" y="72" width="200" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="380" y="98" fill="#5b21b6" font-size="13" font-weight="700" text-anchor="middle">三条链 · 十八个基因</text>
+  <text x="380" y="118" fill="#7c3aed" font-size="11" text-anchor="middle">G0 不相关就停</text>
+
+  <line x1="480" y1="104" x2="518" y2="104" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="520" y="72" width="200" height="64" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="2"/>
+  <text x="620" y="98" fill="#5b21b6" font-size="13" font-weight="700" text-anchor="middle">genome.json</text>
+  <text x="620" y="118" fill="#7c3aed" font-size="11" text-anchor="middle">机器读的那一份</text>
+
+  <path d="M 380 136 L 380 168" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <path d="M 140 168 L 620 168" fill="none" stroke="#7c3aed" stroke-width="1.5"/>
+  <path d="M 140 168 L 140 194" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 380 168 L 380 194" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <path d="M 620 168 L 620 194" fill="none" stroke="#7c3aed" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <rect x="40" y="196" width="200" height="148" rx="8" fill="#f0f4ff" stroke="#2563eb" stroke-width="2"/>
+  <text x="140" y="222" fill="#1e3a5f" font-size="14" font-weight="700" text-anchor="middle">人 · G1–G4</text>
+  <text x="140" y="246" fill="#475569" font-size="12" text-anchor="middle">谁在说</text>
+  <text x="140" y="268" fill="#475569" font-size="12" text-anchor="middle">为什么用</text>
+  <text x="140" y="290" fill="#64748b" font-size="11" text-anchor="middle">画像、动机</text>
+  <text x="140" y="310" fill="#64748b" font-size="11" text-anchor="middle">关系、投入</text>
+
+  <rect x="280" y="196" width="200" height="148" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="2"/>
+  <text x="380" y="222" fill="#92400e" font-size="14" font-weight="700" text-anchor="middle">事 · G5–G12</text>
+  <text x="380" y="246" fill="#92400e" font-size="12" text-anchor="middle">发生了什么</text>
+  <text x="380" y="268" fill="#b45309" font-size="12" text-anchor="middle">一级 12 类</text>
+  <text x="380" y="290" fill="#b45309" font-size="12" text-anchor="middle">二级 59 个</text>
+  <text x="380" y="312" fill="#64748b" font-size="11" text-anchor="middle">情境、情绪、阶段</text>
+
+  <rect x="520" y="196" width="200" height="148" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+  <text x="620" y="222" fill="#166534" font-size="14" font-weight="700" text-anchor="middle">解 · G13–G17</text>
+  <text x="620" y="246" fill="#166534" font-size="12" text-anchor="middle">希望怎样回应</text>
+  <text x="620" y="270" fill="#15803d" font-size="12" text-anchor="middle">Agent 应当</text>
+  <text x="620" y="290" fill="#15803d" font-size="12" text-anchor="middle">→ 评测集</text>
+  <text x="620" y="312" fill="#64748b" font-size="11" text-anchor="middle">能力、轻重、风险</text>
+
+  <rect x="40" y="364" width="210" height="52" rx="8" fill="#f5f3ff" stroke="#7c3aed" stroke-width="1.5"/>
+  <text x="145" y="386" fill="#5b21b6" font-size="12" font-weight="700" text-anchor="middle">看不出</text>
+  <text x="145" y="404" fill="#7c3aed" font-size="11" text-anchor="middle">就标 unknown，不猜</text>
+
+  <rect x="270" y="364" width="220" height="52" rx="8" fill="#fff7ed" stroke="#d97706" stroke-width="1.5"/>
+  <text x="380" y="386" fill="#92400e" font-size="12" font-weight="700" text-anchor="middle">check</text>
+  <text x="380" y="404" fill="#b45309" font-size="11" text-anchor="middle">二级必须属于所选一级</text>
+
+  <rect x="510" y="364" width="210" height="52" rx="8" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+  <text x="615" y="386" fill="#166534" font-size="12" font-weight="700" text-anchor="middle">产品应当</text>
+  <text x="615" y="404" fill="#15803d" font-size="11" text-anchor="middle">进需求池，不进评测集</text>
+
+  <text x="380" y="442" fill="#64748b" font-size="11" text-anchor="middle">人读 genome.md，校验只认 genome.json 里的取值。</text>
+</svg>

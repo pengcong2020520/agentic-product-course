@@ -1,16 +1,17 @@
 node_modules/
 .env
 .env.*
+!.env.example
 .runs/
 .DS_Store
 briefs/
 .private/
 data/
 .venv/
-pipeline/label/.env
 __pycache__/
 *.pyc
 
 # 课程素材（种子材料，只在本地）
 /agentic-product-course/
 .worktrees/
+.pytest_cache/

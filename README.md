@@ -38,12 +38,12 @@ Agent 能做的事越来越多，"能不能做出来"不再是难点。真正的
 
 ### 贯穿全书的项目
 
-一家做 AI 陪伴产品的公司，在一个**通用企业 AI 中台**上建设陪伴应用"独一无二的 TA"。每一项中台能力都分两层讲：通用中台提供什么，陪伴产品要求它做什么定制。
+一家做 AI 陪伴产品的公司，手里有一个通用的企业 AI 中台。**具体做什么样的陪伴产品，不预设。** 第一部分从应用商店里抓下用户的公开评论，打上标签，画出机会地图，再让数据决定：为谁做、解决哪一个痛点、做到哪里为止。产品定下来之后，每一项中台能力都分两层讲：通用中台提供什么，这个产品要求它做什么定制。
 
 ```
 陪伴 Agent = 模型（Kimi）
-          + Harness（Codex：App Server、AGENTS.md、Skills、Subagents、MCP）
-          + Workspace（人设、知识、记忆、定时任务）
+          + Harness（Codex）
+          + 产品定义决定的能力（第一部分得出）
           + 中台（运行底座、模型服务、身份权限、评测与可观测、发布）
 ```
 
@@ -62,7 +62,7 @@ Agent 能做的事越来越多，"能不能做出来"不再是难点。真正的
 >
 > **s05** &nbsp; *"一致性不够，就改规则，不改分数"* &mdash; 用 κ 找出说不清的基因，改规范、只重标、人工裁决
 >
-> **s06** &nbsp; *"定义里的每一句都能指回样本"* &mdash; 分布、切片、行为主题 → 首要用户、Must、MVP、边界
+> **s06** &nbsp; *"定义里的每一句都能指回样本"* &mdash; 分布、切片、机会地图 → 产品假设 → 产品定义
 >
 > **s07** &nbsp; *"写到别人能照着做、照着测"* &mdash; 业务标准与 PRD
 >
@@ -72,7 +72,7 @@ Agent 能做的事越来越多，"能不能做出来"不再是难点。真正的
 >
 > **s10** &nbsp; *"评委先对齐，分数才可信"* &mdash; 人人、人机、抽样校准
 >
-> **s11** &nbsp; *"红线不参与平均"* &mdash; 能力集、回归集与发布门禁
+> **s11** &nbsp; *"关键用例一条不过，就不发布"* &mdash; 能力集、回归集与发布门禁
 >
 > **s12** &nbsp; *"先量一次裸模型"* &mdash; Codex 接 Kimi，用评测集跑出基线
 >
@@ -92,7 +92,7 @@ Agent 能做的事越来越多，"能不能做出来"不再是难点。真正的
 raw = crawl(public_reviews)                  # s01：用户已经写下的声音
 raw = clean(raw)                             # s02：去重、去标识
 labels = annotate(raw, genome)               # s03–s05：按基因图谱打标，并证明标注可信
-definition = define(distribution(labels))    # s06：首要用户、Must、MVP、边界
+definition = define(opportunities(labels))   # s06：机会地图 → 产品假设 → 产品定义
 eval_set = cases_from(definition, labels)    # s08：先有考卷
 
 while not passes(product, eval_set):         # s12 起：每一章让更多用例通过
@@ -144,7 +144,7 @@ flowchart TD
 | [s03](./s03_product_genome/) | Agentic 产品基因图谱 | 人·事·解 / 十八个基因 / 一级与二级触点 / 判定规则 |
 | [s04](./s04_labeling/) | 批量标注 | brief / 分块 / Codex 与 Grok CLI / 自检 OK / 断点续跑 |
 | [s05](./s05_agreement/) | 双标一致性 | κ / 单基因重标 / 关键分歧裁决 / 质量报告 |
-| [s06](./s06_product_definition/) | 从标签到产品定义 | 分布 / 人群切片 / 行为主题 / Must / MVP / 四类处置 |
+| [s06](./s06_product_definition/) | 从标签到产品定义 | 分布 / 人群切片 / 行为主题 / 机会地图 / 产品假设 |
 | s07 – s33 | 编写中 | 见上方格言清单与学习路径 |
 
 ---
@@ -172,7 +172,7 @@ agentic-product-course/
   s03_product_genome/        #   genome.json + genome.md：基因图谱
   s04_labeling/              #   brief.md：给标注 Agent 的任务说明
   s05_agreement/             #   protocol.md：标注与裁决规则
-  s06_product_definition/    #   definition.md：产品定义 v0
+  s06_product_definition/    #   机会地图与产品定义
   tests/                     # 全书测试（pytest）
   docs/                      # 调研与规划
   data/                      # 运行产物（不进仓库）

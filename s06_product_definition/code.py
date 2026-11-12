@@ -7,12 +7,14 @@ s06_product_definition - 从标签到产品定义
 Usage:
     python s06_product_definition/code.py genome-report --src data/labeled/genome-final.jsonl
     python s06_product_definition/code.py segment-report --src data/labeled/genome-final.jsonl
+    python s06_product_definition/code.py opportunities --min-n 15 --w1 1 --w2 1 --w3 1
 """
 
 
 import argparse
 from collections import Counter, defaultdict
 import json
+import math
 from pathlib import Path
 
 
@@ -240,6 +242,205 @@ def segment_report(args, ap):
     print(f"报告已生成（相关样本 {relevant} 条，切片 {len(segments)} 个）")
 
 
+OPPORTUNITY_SEGMENTS = ("陪伴向", "剧情玩家", "创作向", "进阶玩家", "其他/不明")
+
+
+def opportunity_segments(labels):
+    users = values(labels, "g1_user")
+    motives = values(labels, "g2_motive")
+    result = set()
+    if users & {"dream_partner", "confider"} or motives & {
+        "companionship", "emotional_support", "romance"
+    }:
+        result.add("陪伴向")
+    if "story_player" in users:
+        result.add("剧情玩家")
+    if "creator" in users or "creation" in motives:
+        result.add("创作向")
+    if "power_user" in users:
+        result.add("进阶玩家")
+    return result or {"其他/不明"}
+
+
+def opportunity_metrics(key, labels):
+    n = len(labels)
+    intensities = [label["g8_intensity"] for label in labels
+                   if label.get("g8_intensity") is not None]
+    segments = Counter(segment for label in labels for segment in opportunity_segments(label))
+
+    def share(gid, accepted):
+        return sum(label.get(gid) in accepted for label in labels) / n
+
+    result = {
+        "candidate": key, "n": n,
+        "pain": share("g16_severity", ("p0", "p1")),
+        "intensity": sum(intensities) / len(intensities) if intensities else None,
+        "intensity_n": len(intensities),
+        "churn": share("g10_stage", ("churning",)),
+        "regress": share("g10_stage", ("veteran",)),
+        "agent_share": share("g15_solvable", ("agent", "mixed")),
+        "platform_share": share("g15_solvable", ("platform", "mixed")),
+        "business_share": share("g15_solvable", ("business",)),
+        "paying": share("g4_investment", ("paying",)),
+        "segments": {segment: segments[segment] for segment in OPPORTUNITY_SEGMENTS},
+    }
+    intensity_term = (result["intensity"] - 1) / 2 if intensities else 0
+    result["severity"] = (0.5 * result["pain"] + 0.2 * intensity_term
+                          + 0.15 * result["churn"] + 0.15 * result["regress"])
+    result["solvable"] = max(result["agent_share"], result["platform_share"])
+    return result
+
+
+def rank_opportunities(groups, min_n, weights):
+    rows = [opportunity_metrics(key, labels) for key, labels in groups.items()
+            if len(labels) >= min_n]
+    max_n = max((row["n"] for row in rows), default=0)
+    for row in rows:
+        row["size"] = math.log1p(row["n"]) / math.log1p(max_n)
+        row["scores"] = {
+            variant: row["size"] ** w1 * row["severity"] ** w2 * row["solvable"] ** w3
+            for variant, (w1, w2, w3) in weights.items()
+        }
+        row["score"] = row["scores"]["default"]
+        row["ranks"] = {}
+    for variant in weights:
+        ordered = sorted(rows, key=lambda row: (-row["scores"][variant], row["candidate"]))
+        for rank, row in enumerate(ordered, 1):
+            row["ranks"][variant] = rank
+    rows.sort(key=lambda row: row["ranks"]["default"])
+    for row in rows:
+        row["stable"] = all(rank <= 10 for rank in row["ranks"].values())
+    return {
+        "candidate_count": len(groups), "filtered_count": len(groups) - len(rows),
+        "retained_count": len(rows), "max_n": max_n, "rows": rows,
+        "stable_opportunities": [row["candidate"] for row in rows if row["stable"]],
+    }
+
+
+def build_opportunity_map(rows, theme_rows, min_n=15, weights=(1, 1, 1)):
+    """只聚合标签；评论、句子、样本标识和其他元数据不进入输出结构。"""
+    if min_n < 1:
+        raise ValueError("min-n 必须至少为 1")
+    if len(weights) != 3 or any(not math.isfinite(w) or w < 0 for w in weights):
+        raise ValueError("权重必须为三个非负有限数")
+    variants = {"default": list(weights), "size_light": [0.5, 1, 1],
+                "pain_heavy": [1, 1.5, 1]}
+    relevant = {row["id"]: row["labels"] for row in rows
+                if row["labels"].get("relevant") == "yes"}
+    pain_groups = defaultdict(list)
+    excluded_other = set()
+    for labels in relevant.values():
+        for key in values(labels, "g6_subtouch"):
+            if key.endswith(".other"):
+                excluded_other.add(key)
+            else:
+                pain_groups[key].append(labels)
+    themes_by_id = defaultdict(set)
+    for row in theme_rows:
+        if row["id"] in relevant:
+            themes_by_id[row["id"]].update(
+                theme for theme in as_list(row.get("themes"))
+                if isinstance(theme, str) and theme
+            )
+    behavior_groups = defaultdict(list)
+    for sample_id, themes in themes_by_id.items():
+        for theme in themes:
+            behavior_groups[theme].append(relevant[sample_id])
+    return {
+        "relevant_n": len(relevant), "min_n": min_n, "weights": variants,
+        "method": {
+            "denominator": "各候选命中样本数；同一样本同一候选只计一次",
+            "candidates": "相关样本中实际命中的候选；痛点限基因枚举且排除 .other",
+            "pain": "g16_severity 为 p0 或 p1 的占比",
+            "churn / regress": "g10_stage 分别为 churning / veteran 的占比",
+            "agent_share / platform_share / business_share":
+                "g15_solvable 分别为 agent 或 mixed / platform 或 mixed / business 的占比",
+            "paying": "g4_investment 为 paying 的占比",
+            "size": "log(1+n)/log(1+max_n)，各表过滤后独立归一",
+            "severity": "0.5*pain+0.2*(intensity-1)/2+0.15*churn+0.15*regress",
+            "solvable": "max(agent_share, platform_share)",
+            "score": "size^w1 * severity^w2 * solvable^w3；权重 0 表示忽略该项",
+            "intensity": "缺失不计；全部缺失时均值为 null，强度项贡献为 0",
+            "segments": "切片可重叠；未命中前四类的样本计入其他/不明",
+            "陪伴向": "g1 含 dream_partner/confider，或 g2 含 companionship/emotional_support/romance",
+            "剧情玩家 / 创作向 / 进阶玩家":
+                "g1 含 story_player / g1 含 creator 或 g2 含 creation / g1 含 power_user",
+            "ranking": "各表过滤后按分数降序，同分按候选键升序；三组均前 10 为稳定机会",
+        },
+        "pain": {**rank_opportunities(pain_groups, min_n, variants),
+                 "excluded_other_count": len(excluded_other)},
+        "behavior": rank_opportunities(behavior_groups, min_n, variants),
+    }
+
+
+def render_opportunity_map(report):
+    def cell(value):
+        return str(value).replace("&", "&amp;").replace("<", "&lt;").replace(
+            ">", "&gt;"
+        ).replace("|", "&#124;").replace("\n", " ").replace("\r", " ")
+
+    out = ["# 机会地图", "", f"- 相关样本：{report['relevant_n']}；min-n：{report['min_n']}。"]
+    out.extend(f"- {key}：{value}。" for key, value in report["method"].items())
+    out.extend(f"- 权重 {key} (w1,w2,w3)：{tuple(weights)}。"
+               for key, weights in report["weights"].items())
+    out.append("- 人群顺序：陪伴向 / 剧情玩家 / 创作向 / 进阶玩家 / 其他/不明（命中样本数）。")
+    headings = (("pain", "A. 痛点机会"), ("behavior", "B. 行为机会"))
+    columns = ["候选", "n", "pain", "intensity", "intensity_n", "churn", "regress",
+               "agent_share", "platform_share", "business_share", "paying", "size",
+               "severity", "solvable", "score", "名次 default", "名次 size_light",
+               "名次 pain_heavy", "人群分布", "稳定"]
+    for key, title in headings:
+        table_data = report[key]
+        out += ["", f"## {title}", "",
+                f"候选 {table_data['candidate_count']} 个；min-n 过滤 {table_data['filtered_count']} 个；"
+                f"保留 {table_data['retained_count']} 个；max_n = {table_data['max_n']}。"]
+        if key == "pain":
+            out.append(f"另排除 .other 候选 {table_data['excluded_other_count']} 个。")
+        out += ["", "| " + " | ".join(columns) + " |", "|" + "---|" * len(columns)]
+        for row in table_data["rows"]:
+            cells = [cell(row["candidate"]), str(row["n"]), f"{row['pain']:.2%}",
+                     f"{row['intensity']:.4f}" if row["intensity"] is not None else "—",
+                     str(row["intensity_n"])]
+            cells += [f"{row[field]:.2%}" for field in (
+                "churn", "regress", "agent_share", "platform_share", "business_share", "paying"
+            )]
+            cells += [f"{row[field]:.6f}" for field in ("size", "severity", "solvable", "score")]
+            cells += [str(row["ranks"][variant]) for variant in report["weights"]]
+            cells += [" / ".join(str(row["segments"][segment]) for segment in OPPORTUNITY_SEGMENTS),
+                      "是" if row["stable"] else "否"]
+            out.append("| " + " | ".join(cells) + " |")
+    out += ["", "## 稳定机会", ""]
+    for key, title in headings:
+        out.append(f"### {title}")
+        out.append("")
+        for candidate in report[key]["stable_opportunities"]:
+            out.append(f"- {cell(candidate)}")
+        if not report[key]["stable_opportunities"]:
+            out.append("无。")
+        out.append("")
+    return "\n".join(out)
+
+
+def opportunities(args, ap):
+    def read_rows(path):
+        with Path(path).open(encoding="utf-8") as source:
+            return [json.loads(line) for line in source if line.strip()]
+
+    weights = (args.w1, args.w2, args.w3)
+    if args.min_n < 1 or any(not math.isfinite(w) or w < 0 for w in weights):
+        ap.error("min-n 必须至少为 1；权重必须为非负有限数")
+    report = build_opportunity_map(read_rows(args.src), read_rows(args.themes), args.min_n, weights)
+    for destination, content in (
+        (args.out, render_opportunity_map(report)),
+        (args.json, json.dumps(report, ensure_ascii=False, indent=2, allow_nan=False) + "\n"),
+    ):
+        path = Path(destination)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+    print(f"机会地图已生成（相关样本 {report['relevant_n']} 条；"
+          f"痛点过滤 {report['pain']['filtered_count']} 个；行为过滤 {report['behavior']['filtered_count']} 个）")
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -251,6 +452,16 @@ def main():
     ap.add_argument("--src", default="data/labeled/genome-final.jsonl")
     ap.add_argument("--out", default="data/reports/segment-report.md")
     ap.set_defaults(handler=segment_report, command_parser=ap)
+    ap = commands.add_parser("opportunities", help="从痛点标签与行为主题生成机会地图")
+    ap.add_argument("--src", default="data/labeled/genome-final.jsonl")
+    ap.add_argument("--themes", default="data/labeled/agent-themes.jsonl")
+    ap.add_argument("--out", default="data/reports/opportunity-map.md")
+    ap.add_argument("--json", default="data/reports/opportunity-map.json")
+    ap.add_argument("--min-n", type=int, default=15)
+    ap.add_argument("--w1", type=float, default=1, help="主排序的规模权重")
+    ap.add_argument("--w2", type=float, default=1, help="主排序的痛感权重")
+    ap.add_argument("--w3", type=float, default=1, help="主排序的可解权重")
+    ap.set_defaults(handler=opportunities, command_parser=ap)
     args = parser.parse_args()
     args.handler(args, args.command_parser)
 

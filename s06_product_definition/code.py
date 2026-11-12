@@ -2,7 +2,9 @@
 """
 s06_product_definition - 从标签到产品定义
 
-从最终标注生成基因分布与用户画像切片报告，作为产品定义的输入。
+标签 → 基因分布与人群切片 → 机会地图（规模·痛感·可解，三组权重）→ 证据回读（人工）→ 产品定义
+
+本脚本生成前三步的报告，只含统计数字；证据回读与定义写作由人完成。
 
 Usage:
     python s06_product_definition/code.py genome-report --src data/labeled/genome-final.jsonl

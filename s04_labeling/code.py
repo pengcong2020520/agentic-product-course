@@ -20,9 +20,11 @@ import os
 import random
 import shlex
 import subprocess
+import tempfile
 import time
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 from pathlib import Path
 
 
@@ -167,6 +169,7 @@ def merge(args, ap):
 
 def run(args, ap):
     """保留 shell 调用参数、总并发上限、断点校验与日志/brief 命名。"""
+    started_at = datetime.now(timezone.utc).isoformat()
     if args.jobs < 1:
         ap.error("并发数必须大于 0")
     root = Path(__file__).resolve().parents[1]
@@ -214,6 +217,7 @@ def run(args, ap):
                                stdout=output, stderr=subprocess.STDOUT, check=False)
             except OSError as exc:
                 output.write(f"{exc}\n")  # 与 shell 的 || true 一致，继续校验并运行其他分块。
+            output.write(f"\n# annotator-version: {metadata['annotators'][who]['version']}\n")
         verdict = "没能判定（未生成输出）"
         if out.is_file() and out.stat().st_size:
             try:
@@ -223,11 +227,60 @@ def run(args, ap):
                 verdict = f"{type(exc).__name__}: {exc}"
         print(f"{tag} {number} 用时 {int(time.time()) - start}s：{verdict}", flush=True)
 
+    annotators = args.annotators.replace(",", " ").split()
+    metadata = {"started_at": started_at, "annotators": {
+        who: {"bin": codex if who == "codex" else grok, "version": "unknown"}
+        for who in annotators
+    }, "gene": gene}
+
+    def preflight(who):
+        info = metadata["annotators"][who]
+        command = [info["bin"], "--version"]
+        with tempfile.TemporaryDirectory(prefix=f"labeling-{who}-") as temporary:
+            smoke = Path(temporary) / "smoke.txt"
+            log = Path(temporary) / "preflight.log"
+            with log.open("w", encoding="utf-8") as output:
+                try:
+                    version = subprocess.run(command, cwd=temporary, env=environment,
+                                             stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                             text=True, check=False, timeout=15)
+                    output.write(version.stdout or "")
+                    if version.returncode != 0 or not (version.stdout or "").strip():
+                        raise RuntimeError("版本查询失败或返回空版本")
+                    info["version"] = version.stdout.splitlines()[0]
+                    prompt = "Write a file named smoke.txt in the current directory containing exactly ok (no newline)."
+                    if who == "codex":
+                        command = [info["bin"], "exec", "-C", temporary, "-s", "workspace-write",
+                                   "--skip-git-repo-check", "-"]
+                    else:
+                        command = [info["bin"], "-p", prompt, "--always-approve", "--cwd", temporary]
+                    output.flush()
+                    result = subprocess.run(command, cwd=temporary, env=environment,
+                                            input=prompt if who == "codex" else None, text=True,
+                                            stdout=output, stderr=subprocess.STDOUT, check=False, timeout=120)
+                    if result.returncode != 0:
+                        raise RuntimeError(f"冒烟命令退出码 {result.returncode}")
+                    if not smoke.is_file() or smoke.read_text(encoding="utf-8") != "ok":
+                        raise RuntimeError("smoke.txt 不存在或内容不是 ok")
+                    return
+                except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as exc:
+                    failure = str(exc)
+            print(f"冒烟检查失败：{who}\n命令：{shlex.join(command)}\n原因：{failure}\n日志末尾 20 行：", flush=True)
+            print("\n".join(log.read_text(encoding="utf-8", errors="replace").splitlines()[-20:]), flush=True)
+            raise SystemExit(2)
+
     # Like the original shell, resolve relative data paths from the repository root.
     os.chdir(root)
     if not args.dry_run:
         (directory / "logs").mkdir(parents=True, exist_ok=True)
         (directory / "briefs").mkdir(parents=True, exist_ok=True)
+        try:
+            if not args.skip_preflight:
+                for who in metadata["annotators"]:
+                    preflight(who)
+        finally:
+            (directory / "logs" / "run-meta.json").write_text(
+                json.dumps(metadata, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     tasks = [(who, src) for src in sorted((directory / "chunks").glob("*.jsonl"))
              for who in args.annotators.replace(",", " ").split()]
     if args.dry_run:
@@ -269,6 +322,7 @@ def main():
     ap.add_argument("annotators", help="标注者，逗号分隔，如 codex,grok")
     ap.add_argument("jobs", type=int, nargs="?", default=5)
     ap.add_argument("--dry-run", action="store_true", help="仅打印命令；不调用 CLI、不写文件")
+    ap.add_argument("--skip-preflight", action="store_true", help="跳过执行器冒烟检查及版本查询")
     ap.set_defaults(handler=run, command_parser=ap)
     args = parser.parse_args()
     args.handler(args, args.command_parser)
